@@ -43,7 +43,6 @@ export type Database = {
           id: number
           source: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           back: string
@@ -53,7 +52,6 @@ export type Database = {
           id?: number
           source: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           back?: string
@@ -63,7 +61,6 @@ export type Database = {
           id?: number
           source?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -133,7 +130,7 @@ export type Database = {
           source_text_hash: string
           source_text_length: number
           updated_at?: string
-          user_id: string
+          user_id?: string
         }
         Update: {
           accepted_edited_count?: number | null
@@ -147,6 +144,27 @@ export type Database = {
           source_text_length?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          id: string
+          email: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string | null
+          created_at?: string
+          updated_at?: string
         }
         Relationships: []
       }

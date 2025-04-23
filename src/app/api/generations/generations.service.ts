@@ -7,13 +7,6 @@ class GenerationsService {
     const sourceTextHash = createHash('md5').update(command.source_text).digest('hex');
     const startTime = Date.now();
 
-    // Log the request details
-    console.log('Attempting to create generation with:', {
-      user_id: DEFAULT_USER_ID,
-      source_text_hash: sourceTextHash,
-      source_text_length: command.source_text.length
-    });
-
     try {
       // Try to insert with minimal required fields first
       const { data: generation, error } = await supabaseClient
@@ -32,13 +25,6 @@ class GenerationsService {
         .single();
 
       if (error) {
-        // Log detailed error information
-        console.error('Detailed Supabase error:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
         throw new Error(`Database error: ${error.message}`);
       }
 
@@ -75,11 +61,6 @@ class GenerationsService {
         console.error('Failed to update generation:', updateError);
       }
 
-      console.log('Successfully created generation:', {
-        id: generation.id,
-        proposals_count: proposals.length
-      });
-
       return {
         generation_id: generation.id,
         flashcards_proposals: proposals,
@@ -90,33 +71,6 @@ class GenerationsService {
       console.error('Generation service error:', error);
       throw error;
     }
-  }
-
-  private async logGenerationError(generationId: number, error: any) {
-    const errorResult = await supabaseClient
-      .from('generation_error_logs')
-      .insert({
-        generation_id: generationId,
-        user_id: DEFAULT_USER_ID,
-        error_message: error.message,
-        error_code: error.code || 'UNKNOWN',
-        model: 'mock-gpt-4',
-        source_text_hash: '',
-        created_at: new Date().toISOString(), // Add created_at explicitly
-        source_text_length: 0
-      });
-
-    if (errorResult.error) {
-      console.error('Failed to log error:', errorResult.error);
-    }
-
-    await supabaseClient
-      .from('generations')
-      .update({ 
-        generated_count: 0,
-        generation_duration: 0
-      })
-      .eq('id', generationId);
   }
 }
 
