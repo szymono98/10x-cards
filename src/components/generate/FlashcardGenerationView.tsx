@@ -86,7 +86,31 @@ export function FlashcardGenerationView() {
     try {
       await save({ flashcards: acceptedFlashcards });
       startTransition(() => {
-        setSuccess("Fiszki zostały pomyślnie zapisane");
+        setSuccess("Flashcards are saved successfully");
+        setProposals([]);
+        setGenerationId(null);
+        setText("");
+      });
+    } catch (error) {
+      console.error("Failed to save flashcards:", error);
+    }
+  }, [proposals, generationId, save, setText]);
+
+  const handleSaveAll = useCallback(async () => {
+    if (!generationId) return;
+    setSuccess(null);
+
+    const allFlashcards = proposals.map((p) => ({
+      front: p.front,
+      back: p.back,
+      source: p.edited ? ("ai-edited" as const) : ("ai-full" as const),
+      generation_id: generationId,
+    }));
+
+    try {
+      await save({ flashcards: allFlashcards });
+      startTransition(() => {
+        setSuccess("All flashcards are saved successfully");
         setProposals([]);
         setGenerationId(null);
         setText("");
@@ -98,7 +122,7 @@ export function FlashcardGenerationView() {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Generowanie fiszek</h1>
+      <h1 className="text-2xl font-bold mb-6">Flashcards generate</h1>
       <div className="space-y-6">
         <TextInputArea value={text} onChange={setText} />
         <GenerateButton
@@ -120,11 +144,19 @@ export function FlashcardGenerationView() {
               onReject={handleReject}
               onEdit={handleEdit}
             />
-            <BulkSaveButton
-              onSaveAccepted={handleSaveAccepted}
-              hasAcceptedFlashcards={proposals.some((p) => p.accepted)}
-              isLoading={isSaving || isPending}
-            />
+            <div className="flex gap-4">
+              <BulkSaveButton
+                onSaveAccepted={handleSaveAccepted}
+                hasAcceptedFlashcards={proposals.some((p) => p.accepted)}
+                isLoading={isSaving || isPending}
+              />
+              <BulkSaveButton
+                onSaveAccepted={handleSaveAll}
+                hasAcceptedFlashcards={proposals.length > 0}
+                isLoading={isSaving || isPending}
+                label="Zapisz wszystkie"
+              />
+            </div>
           </>
         )}
       </div>

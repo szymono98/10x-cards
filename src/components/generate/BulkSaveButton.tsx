@@ -5,12 +5,14 @@ interface BulkSaveButtonProps {
   onSaveAccepted: () => Promise<void>;
   hasAcceptedFlashcards: boolean;
   isLoading: boolean;
+  label?: string;
 }
 
 export function BulkSaveButton({
   onSaveAccepted,
   hasAcceptedFlashcards,
   isLoading,
+  label = "Save accepted",
 }: BulkSaveButtonProps) {
   return (
     <div className="flex justify-end mt-6">
@@ -24,7 +26,7 @@ export function BulkSaveButton({
         ) : (
           <Save className="w-4 h-4 mr-2" />
         )}
-        {isLoading ? "Zapisywanie..." : "Zapisz zaakceptowane"}
+        {isLoading ? "Saving..." : label}
       </Button>
     </div>
   );
