@@ -21,7 +21,6 @@ This table is managed by Supabase Auth.
 - created_at: TIMESTAMPTZ NOT NULL DEFAULT now()
 - updated_at: TIMESTAMPTZ NOT NULL DEFAULT now()
 - generation_id: BIGINT REFERENCES generations(id) ON DELETE SET NULL
-- user_id: UUID NOT NULL REFERENCES users(id)
 
 _Trigger: Automatically update the `updated_at` column on record updates._
 
@@ -52,14 +51,12 @@ _Trigger: Automatically update the `updated_at` column on record updates._
 
 ## 2. Relacje
 
-- Jeden użytkownik (users) ma wiele fiszek (flashcards).
 - Jeden użytkownik (users) ma wiele rekordów w tabeli generations.
 - Jeden użytkownik (users) ma wiele rekordów w tabeli generation_error_logs.
 - Każda fiszka (flashcards) może opcjonalnie odnosić się do jednej generacji (generations) poprzez generation_id.
 
 ## 3. Indeksy
 
-- Indeks na kolumnie `user_id` w tabeli flashcards.
 - Indeks na kolumnie `generation_id` w tabeli flashcards.
 - Indeks na kolumnie `user_id` w tabeli generations.
 - Indeks na kolumnie `user_id` w tabeli generation_error_logs.
