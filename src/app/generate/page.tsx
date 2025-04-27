@@ -1,4 +1,5 @@
 import { FlashcardGenerationView } from "@/components/generate/FlashcardGenerationView";
+import { RootLayout } from "@/components/layouts/RootLayout";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function GeneratePage() {
-  return <FlashcardGenerationView />;
+  return (
+    <RootLayout>
+      <FlashcardGenerationView />
+    </RootLayout>
+  );
 }
