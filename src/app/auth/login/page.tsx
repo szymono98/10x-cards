@@ -6,6 +6,8 @@ import AuthLayout from "@/components/layouts/AuthLayout";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 
 interface LoginFormData {
   email: string;
@@ -17,12 +19,44 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<LoginFormData>();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const supabase = createClientComponentClient();
 
   const onSubmit = async (data: LoginFormData) => {
-    // Backend implementation will be added later
-    console.log("Form submitted:", data);
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) {
+        if (error.message === "Invalid login credentials") {
+          setError("root", {
+            message:
+              "Nieprawidłowy email lub hasło. Jeśli nie masz jeszcze konta, zarejestruj się.",
+          });
+        } else {
+          setError("root", {
+            message: `Wystąpił błąd podczas logowania: ${error.message}`,
+          });
+        }
+        return;
+      }
+
+      router.push("/generate");
+      router.refresh();
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("root", {
+        message: "Wystąpił nieoczekiwany błąd podczas logowania",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -58,6 +92,12 @@ export default function LoginPage() {
             error={errors.password?.message}
           />
         </div>
+
+        {errors.root && (
+          <div className="p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 rounded-md">
+            {errors.root.message}
+          </div>
+        )}
 
         <div className="flex items-center justify-end">
           <Link

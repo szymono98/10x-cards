@@ -5,7 +5,9 @@ import { AuthInput } from "@/components/auth/AuthInput";
 import AuthLayout from "@/components/layouts/AuthLayout";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 
 interface RegisterFormData {
   email: string;
@@ -19,14 +21,100 @@ export default function RegisterPage() {
     handleSubmit,
     watch,
     formState: { errors },
+    setError,
   } = useForm<RegisterFormData>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const password = watch("password");
+  const router = useRouter();
+  const supabase = createClientComponentClient();
 
-  const onSubmit = async (data: RegisterFormData) => {
-    // Backend implementation will be added later
-    console.log("Form submitted:", data);
-  };
+  const onSubmit = useCallback(
+    async (data: RegisterFormData) => {
+      try {
+        setIsLoading(true);
+        const redirectUrl = new URL("/auth/callback", window.location.origin);
+        redirectUrl.searchParams.append("registration", "true");
+
+        const { error: signUpError } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password,
+          options: {
+            emailRedirectTo: redirectUrl.toString(),
+            data: {
+              email: data.email,
+              registration: true,
+            },
+          },
+        });
+
+        if (signUpError) {
+          if (signUpError.message.includes("already registered")) {
+            setError("email", {
+              message: "Ten adres email jest już zarejestrowany",
+            });
+          } else {
+            setError("root", {
+              message: `Wystąpił błąd podczas rejestracji: ${signUpError.message}`,
+            });
+          }
+          return;
+        }
+
+        await Promise.all([
+          supabase.auth.signOut(),
+          new Promise((resolve) => setTimeout(resolve, 100)),
+        ]);
+
+        setIsSuccess(true);
+      } catch (error) {
+        console.error("Registration error:", error);
+        setError("root", {
+          message: "Wystąpił nieoczekiwany błąd podczas rejestracji",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [supabase.auth, setError]
+  );
+
+  useEffect(() => {
+    const checkAndSignOut = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        await supabase.auth.signOut();
+      }
+    };
+
+    checkAndSignOut();
+  }, [supabase.auth]);
+
+  if (isSuccess) {
+    return (
+      <AuthLayout
+        title="Sprawdź swoją skrzynkę email"
+        subtitle="Wysłaliśmy link potwierdzający na podany adres email"
+      >
+        <div className="text-center space-y-4">
+          <p className="text-muted-foreground">
+            Aby dokończyć rejestrację, kliknij w link, który właśnie wysłaliśmy
+            na Twój adres email. Jeśli nie otrzymałeś wiadomości w ciągu kilku
+            minut, sprawdź folder spam.
+          </p>
+          <Button
+            onClick={() => router.push("/auth/login")}
+            variant="outline"
+            className="w-full font-medium"
+          >
+            Przejdź do strony logowania
+          </Button>
+        </div>
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout

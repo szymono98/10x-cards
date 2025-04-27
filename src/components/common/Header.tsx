@@ -1,8 +1,28 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useSupabase } from "@/lib/providers/supabase-provider";
 
 export function Header() {
-  const isLoggedIn = false; // TODO: Replace with actual auth state
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const { supabase, user } = useSupabase();
+
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true);
+      await supabase.auth.signOut();
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Error logging out:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <header className="border-b bg-white dark:bg-gray-800">
@@ -15,7 +35,7 @@ export function Header() {
         </Link>
 
         <nav className="flex gap-4">
-          {isLoggedIn ? (
+          {user ? (
             <>
               <Button variant="ghost" asChild>
                 <Link href="/sets">Moje zestawy</Link>
@@ -23,7 +43,13 @@ export function Header() {
               <Button variant="ghost" asChild>
                 <Link href="/profile">Profil</Link>
               </Button>
-              <Button variant="outline">Wyloguj</Button>
+              <Button
+                variant="outline"
+                onClick={handleLogout}
+                disabled={isLoading}
+              >
+                {isLoading ? "Wylogowywanie..." : "Wyloguj"}
+              </Button>
             </>
           ) : (
             <>

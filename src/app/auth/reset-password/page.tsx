@@ -6,6 +6,7 @@ import AuthLayout from "@/components/layouts/AuthLayout";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 interface ResetPasswordFormData {
   email: string;
@@ -16,26 +17,53 @@ export default function ResetPasswordPage() {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<ResetPasswordFormData>();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const supabase = createClientComponentClient();
 
   const onSubmit = async (data: ResetPasswordFormData) => {
-    // Backend implementation will be added later
-    console.log("Form submitted:", data);
-    setIsSubmitted(true);
+    try {
+      setIsLoading(true);
+
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${window.location.origin}/auth/update-password`,
+      });
+
+      if (error) {
+        setError("root", {
+          message: `Wystąpił błąd podczas wysyłania linku: ${error.message}`,
+        });
+        return;
+      }
+
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error("Reset password error:", error);
+      setError("root", {
+        message: "Wystąpił nieoczekiwany błąd podczas resetowania hasła",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSubmitted) {
     return (
       <AuthLayout
-        title="Sprawdź swoją skrzynkę"
-        subtitle="Jeśli konto o podanym adresie email istnieje, otrzymasz wiadomość z instrukcją resetowania hasła."
+        title="Sprawdź swoją skrzynkę email"
+        subtitle="Jeśli konto o podanym adresie email istnieje, wyślemy Ci link do zresetowania hasła."
       >
-        <div className="mt-6 text-center">
+        <div className="text-center space-y-4">
+          <p className="text-muted-foreground">
+            Kliknij w link, który właśnie wysłaliśmy na Twój adres email, aby
+            ustawić nowe hasło. Link będzie aktywny przez 24 godziny. Jeśli nie
+            otrzymałeś wiadomości, sprawdź folder spam.
+          </p>
           <Link
             href="/auth/login"
-            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            className="block text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
             Powrót do logowania
           </Link>
