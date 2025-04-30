@@ -7,6 +7,7 @@
 - [Getting Started Locally](#getting-started-locally)
 - [Available Scripts](#available-scripts)
 - [Project Scope](#project-scope)
+- [Testing](#testing)
 - [Project Status](#project-status)
 - [License](#license)
 
@@ -19,6 +20,11 @@
 - **Frontend:** Next.js 15, React 19, TypeScript 5, Tailwind CSS 4, Shadcn/ui
 - **Backend & Database:** Supabase
 - **AI Communication:** Openrouter.ai
+- **Testing:**
+  - **Unit & Integration:** Vitest, React Testing Library, MSW (Mock Service Worker)
+  - **E2E:** Playwright
+  - **Visual Testing:** Percy/Chromatic (optional)
+  - **Accessibility:** axe-core
 - **CI/CD & Hosting:** GitHub Actions, DigitalOcean
 
 ## Getting Started Locally
@@ -41,6 +47,10 @@
 - **lint:** Lints the project code.
 - **format:** Checks code format with Prettier.
 - **format:fix:** Fixes code formatting issues with Prettier.
+- **test:** Runs unit and integration tests with Vitest.
+- **test:ui:** Runs Vitest with UI interface for interactive debugging.
+- **test:e2e:** Runs end-to-end tests with Playwright.
+- **test:coverage:** Generates test coverage report.
 
 ## Project Scope
 
@@ -51,6 +61,45 @@ The project focuses on the following key functionalities:
 - **User Authentication:** Registration, login, and secure access to flashcards.
 - **Spaced Repetition Learning:** Integrate a scheduling algorithm for effective learning through review sessions.
 - **Statistics and Analytics:** Track AI-generated flashcard usage and user engagement.
+
+## Testing
+
+The project uses a comprehensive testing strategy:
+
+- **Unit & Integration Tests:**
+
+  - Vitest as the test runner (faster alternative to Jest)
+  - React Testing Library for component testing
+  - MSW (Mock Service Worker) for API mocking
+  - Testing Library User Event for simulating user interactions
+
+- **End-to-End Tests:**
+
+  - Playwright for browser-based end-to-end testing
+  - Tests cover critical user flows including:
+    - Authentication (registration, login, password reset)
+    - Flashcard generation and editing
+    - Saving and managing flashcards
+    - Protected route access
+
+- **Additional Testing Tools:**
+  - axe-core for accessibility testing
+  - Percy/Chromatic for visual regression testing (optional)
+  - GitHub Actions for CI/CD test automation
+  - Supabase mock client for database integration testing
+
+Run tests using the following commands:
+
+```bash
+# Unit and integration tests
+npm test
+
+# E2E tests
+npm run test:e2e
+
+# Generate coverage report
+npm run test:coverage
+```
 
 ## Project Status
 
