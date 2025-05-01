@@ -93,6 +93,8 @@ export function FlashcardGenerationView() {
       });
     } catch (error) {
       console.error("Failed to save flashcards:", error);
+      setSuccess(null);
+      throw error;
     }
   }, [proposals, generationId, save, setText]);
 
@@ -117,6 +119,8 @@ export function FlashcardGenerationView() {
       });
     } catch (error) {
       console.error("Failed to save flashcards:", error);
+      setSuccess(null);
+      throw error;
     }
   }, [proposals, generationId, save, setText]);
 
