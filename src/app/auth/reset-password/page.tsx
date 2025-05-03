@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
 
       if (error) {
         setError("root", {
-          message: `Wystąpił błąd podczas wysyłania linku: ${error.message}`,
+          message: `Error while sending link: ${error.message}`,
         });
         return;
       }
@@ -42,7 +42,7 @@ export default function ResetPasswordPage() {
     } catch (error) {
       console.error("Reset password error:", error);
       setError("root", {
-        message: "Wystąpił nieoczekiwany błąd podczas resetowania hasła",
+        message: "An unexpected error occurred during password reset",
       });
     } finally {
       setIsLoading(false);
@@ -52,20 +52,20 @@ export default function ResetPasswordPage() {
   if (isSubmitted) {
     return (
       <AuthLayout
-        title="Sprawdź swoją skrzynkę email"
-        subtitle="Jeśli konto o podanym adresie email istnieje, wyślemy Ci link do zresetowania hasła."
+        title="Check your email"
+        subtitle="If an account exists with this email, we&apos;ll send you a password reset link."
       >
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">
-            Kliknij w link, który właśnie wysłaliśmy na Twój adres email, aby
-            ustawić nowe hasło. Link będzie aktywny przez 24 godziny. Jeśli nie
-            otrzymałeś wiadomości, sprawdź folder spam.
+            Click the link we just sent to your email address to set a new password.
+            The link will be active for 24 hours. If you don&apos;t receive the email,
+            please check your spam folder.
           </p>
           <Link
             href="/auth/login"
             className="block text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
-            Powrót do logowania
+            Back to login
           </Link>
         </div>
       </AuthLayout>
@@ -74,8 +74,8 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthLayout
-      title="Resetuj hasło"
-      subtitle="Wprowadź swój adres email, aby otrzymać link do resetowania hasła"
+      title="Reset password"
+      subtitle="Enter your email address to receive a password reset link"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <AuthInput
@@ -84,17 +84,17 @@ export default function ResetPasswordPage() {
           type="email"
           autoComplete="email"
           registration={register("email", {
-            required: "Email jest wymagany",
+            required: "Email is required",
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Nieprawidłowy format email",
+              message: "Invalid email format",
             },
           })}
           error={errors.email?.message}
         />
 
         <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "Wysyłanie..." : "Wyślij link resetujący"}
+          {isLoading ? "Sending..." : "Send reset link"}
         </Button>
       </form>
     </AuthLayout>

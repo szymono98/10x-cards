@@ -13,11 +13,11 @@ export function TextInputArea({ value, onChange }: TextInputAreaProps) {
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="source-text">Tekst źródłowy</Label>
+      <Label htmlFor="source-text">Source text</Label>
       <Textarea
         id="source-text"
         data-testid="source-text-input"
-        placeholder="Wklej tekst do przetworzenia (1000-10000 znaków)..."
+        placeholder="Paste your text for processing (1000-10000 characters)..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={`min-h-[200px] ${
@@ -29,10 +29,10 @@ export function TextInputArea({ value, onChange }: TextInputAreaProps) {
           charCount > 0 && !isValid ? "text-red-500" : "text-gray-500"
         }`}
       >
-        {charCount}/10000 znaków{" "}
+        {charCount}/10000 characters{" "}
         {remainingChars >= 0
-          ? `(pozostało ${remainingChars})`
-          : "(przekroczono limit)"}
+          ? `(${remainingChars} remaining)`
+          : "(limit exceeded)"}
       </div>
     </div>
   );

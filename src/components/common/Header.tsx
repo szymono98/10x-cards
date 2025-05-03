@@ -38,26 +38,26 @@ export function Header() {
           {user ? (
             <>
               <Button variant="ghost" asChild>
-                <Link href="/sets">Moje zestawy</Link>
+                <Link href="/sets">Saved</Link>
               </Button>
               <Button variant="ghost" asChild>
-                <Link href="/profile">Profil</Link>
+                <Link href="/profile">Profile</Link>
               </Button>
               <Button
                 variant="outline"
                 onClick={handleLogout}
                 disabled={isLoading}
               >
-                {isLoading ? "Wylogowywanie..." : "Wyloguj"}
+                {isLoading ? "Logging out..." : "Logout"}
               </Button>
             </>
           ) : (
             <>
               <Button variant="ghost" asChild>
-                <Link href="/auth/login">Zaloguj</Link>
+                <Link href="/auth/login">Sign in</Link>
               </Button>
               <Button asChild>
-                <Link href="/auth/register">Zarejestruj</Link>
+                <Link href="/auth/register">Sign up</Link>
               </Button>
             </>
           )}

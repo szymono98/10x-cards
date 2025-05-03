@@ -8,7 +8,7 @@ interface ErrorNotificationProps {
 }
 
 export const ErrorNotification = memo(function ErrorNotification({
-  title = "Wystąpił błąd",
+  title = "An error occurred",
   message,
 }: ErrorNotificationProps) {
   if (!message) return null;

@@ -51,11 +51,11 @@ export default function RegisterPage() {
         if (signUpError) {
           if (signUpError.message.includes("already registered")) {
             setError("email", {
-              message: "Ten adres email jest już zarejestrowany",
+              message: "This email is already registered",
             });
           } else {
             setError("root", {
-              message: `Wystąpił błąd podczas rejestracji: ${signUpError.message}`,
+              message: `An error occurred during registration: ${signUpError.message}`,
             });
           }
           return;
@@ -70,7 +70,7 @@ export default function RegisterPage() {
       } catch (error) {
         console.error("Registration error:", error);
         setError("root", {
-          message: "Wystąpił nieoczekiwany błąd podczas rejestracji",
+          message: "An unexpected error occurred during registration",
         });
       } finally {
         setIsLoading(false);
@@ -95,21 +95,21 @@ export default function RegisterPage() {
   if (isSuccess) {
     return (
       <AuthLayout
-        title="Sprawdź swoją skrzynkę email"
-        subtitle="Wysłaliśmy link potwierdzający na podany adres email"
+        title="Check your email"
+        subtitle="We've sent a confirmation link to your email address"
       >
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">
-            Aby dokończyć rejestrację, kliknij w link, który właśnie wysłaliśmy
-            na Twój adres email. Jeśli nie otrzymałeś wiadomości w ciągu kilku
-            minut, sprawdź folder spam.
+            To complete your registration, click the link we just sent to your
+            email address. If you don&apos;t receive the email within a few
+            minutes, please check your spam folder.
           </p>
           <Button
             onClick={() => router.push("/auth/login")}
             variant="outline"
             className="w-full font-medium"
           >
-            Przejdź do strony logowania
+            Go to login page
           </Button>
         </div>
       </AuthLayout>
@@ -118,8 +118,8 @@ export default function RegisterPage() {
 
   return (
     <AuthLayout
-      title="Utwórz konto"
-      subtitle="Lub zaloguj się jeśli masz już konto"
+      title="Create an account"
+      subtitle="Or sign in if you already have an account"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
@@ -129,10 +129,10 @@ export default function RegisterPage() {
             type="email"
             autoComplete="email"
             registration={register("email", {
-              required: "Email jest wymagany",
+              required: "Email is required",
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Nieprawidłowy format email",
+                message: "Invalid email format",
               },
             })}
             error={errors.email?.message}
@@ -140,13 +140,13 @@ export default function RegisterPage() {
 
           <AuthInput
             id="password"
-            label="Hasło"
+            label="Password"
             type="password"
             registration={register("password", {
-              required: "Hasło jest wymagane",
+              required: "Password is required",
               minLength: {
                 value: 8,
-                message: "Hasło musi mieć minimum 8 znaków",
+                message: "Password must be at least 8 characters",
               },
             })}
             error={errors.password?.message}
@@ -154,12 +154,12 @@ export default function RegisterPage() {
 
           <AuthInput
             id="confirmPassword"
-            label="Potwierdź hasło"
+            label="Confirm password"
             type="password"
             registration={register("confirmPassword", {
-              required: "Potwierdzenie hasła jest wymagane",
+              required: "Password confirmation is required",
               validate: (value) =>
-                value === password || "Hasła nie są identyczne",
+                value === password || "Passwords do not match",
             })}
             error={errors.confirmPassword?.message}
           />
@@ -170,7 +170,7 @@ export default function RegisterPage() {
           disabled={isLoading}
           className="w-full font-medium shadow-lg hover:shadow-indigo-500/20 transition-all"
         >
-          {isLoading ? "Tworzenie konta..." : "Zarejestruj się"}
+          {isLoading ? "Creating account..." : "Sign up"}
         </Button>
 
         <div className="relative my-6">
@@ -179,7 +179,7 @@ export default function RegisterPage() {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="bg-white dark:bg-gray-800 px-2 text-muted-foreground">
-              lub
+              or
             </span>
           </div>
         </div>
@@ -188,7 +188,7 @@ export default function RegisterPage() {
           href="/auth/login"
           className="block text-center text-sm font-medium text-primary hover:text-primary/80 transition-colors"
         >
-          Masz już konto? Zaloguj się
+          Already have an account? Sign in
         </Link>
       </form>
     </AuthLayout>

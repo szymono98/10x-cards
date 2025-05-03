@@ -159,7 +159,7 @@ export function FlashcardGenerationView() {
                 onSaveAccepted={handleSaveAll}
                 hasAcceptedFlashcards={proposals.length > 0}
                 isLoading={isSaving || isPending}
-                label="Zapisz wszystkie"
+                label="Save all"
               />
             </div>
           </>

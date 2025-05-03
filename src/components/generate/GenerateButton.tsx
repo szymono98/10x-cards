@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Wand2 } from "lucide-react";
 
 interface GenerateButtonProps {
   onClick: () => Promise<void>;
@@ -16,16 +16,20 @@ export function GenerateButton({
     <Button
       onClick={onClick}
       disabled={disabled}
-      className="w-full sm:w-auto"
+      size="lg"
+      className="w-full font-medium shadow hover:shadow-indigo-500/20 transition-all"
       data-testid="generate-flashcards-button"
     >
       {isLoading ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Generowanie...
+          Generating...
         </>
       ) : (
-        "Generuj fiszki"
+        <>
+          <Wand2 className="mr-2 h-4 w-4" />
+          Generate flashcards
+        </>
       )}
     </Button>
   );

@@ -54,14 +54,14 @@ export function FlashcardItem({
                 <Textarea
                   value={front}
                   onChange={(e) => setFront(e.target.value)}
-                  placeholder="Przód fiszki"
+                  placeholder="Front of the flashcard"
                   maxLength={200}
                   data-testid={`${testId}-front-edit`}
                 />
                 <Textarea
                   value={back}
                   onChange={(e) => setBack(e.target.value)}
-                  placeholder="Tył fiszki"
+                  placeholder="Back of the flashcard"
                   maxLength={500}
                   data-testid={`${testId}-back-edit`}
                 />
@@ -94,7 +94,7 @@ export function FlashcardItem({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Edytuj fiszkę</p>
+                    <p>Edit flashcard</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -111,7 +111,7 @@ export function FlashcardItem({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Odrzuć fiszkę</p>
+                    <p>Reject flashcard</p>
                   </TooltipContent>
                 </Tooltip>
 
@@ -128,7 +128,7 @@ export function FlashcardItem({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Zaakceptuj fiszkę</p>
+                    <p>Accept flashcard</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

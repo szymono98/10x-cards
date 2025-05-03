@@ -8,7 +8,7 @@ interface SuccessNotificationProps {
 }
 
 export const SuccessNotification = memo(function SuccessNotification({
-  title = "Sukces",
+  title = "Success",
   message,
 }: SuccessNotificationProps) {
   if (!message) return null;

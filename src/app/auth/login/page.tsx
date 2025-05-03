@@ -37,11 +37,11 @@ export default function LoginPage() {
         if (error.message === "Invalid login credentials") {
           setError("root", {
             message:
-              "Nieprawidłowy email lub hasło. Jeśli nie masz jeszcze konta, zarejestruj się.",
+              "Invalid email or password. If you don't have an account yet, sign up.",
           });
         } else {
           setError("root", {
-            message: `Wystąpił błąd podczas logowania: ${error.message}`,
+            message: `An error occurred during login: ${error.message}`,
           });
         }
         return;
@@ -52,7 +52,7 @@ export default function LoginPage() {
     } catch (error) {
       console.error("Login error:", error);
       setError("root", {
-        message: "Wystąpił nieoczekiwany błąd podczas logowania",
+        message: "An unexpected error occurred during login",
       });
     } finally {
       setIsLoading(false);
@@ -61,8 +61,8 @@ export default function LoginPage() {
 
   return (
     <AuthLayout
-      title="Zaloguj się do konta"
-      subtitle="Lub utwórz nowe konto jeśli jeszcze nie masz"
+      title="Log in to your account"
+      subtitle="Or create a new account if you don't have one"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
@@ -72,10 +72,10 @@ export default function LoginPage() {
             type="email"
             autoComplete="email"
             registration={register("email", {
-              required: "Email jest wymagany",
+              required: "Email is required",
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Nieprawidłowy format email",
+                message: "Invalid email format",
               },
             })}
             error={errors.email?.message}
@@ -83,11 +83,11 @@ export default function LoginPage() {
 
           <AuthInput
             id="password"
-            label="Hasło"
+            label="Password"
             type="password"
             autoComplete="current-password"
             registration={register("password", {
-              required: "Hasło jest wymagane",
+              required: "Password is required",
             })}
             error={errors.password?.message}
           />
@@ -104,7 +104,7 @@ export default function LoginPage() {
             href="/auth/reset-password"
             className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
-            Zapomniałeś hasła?
+            Forgot password?
           </Link>
         </div>
 
@@ -113,7 +113,7 @@ export default function LoginPage() {
           disabled={isLoading}
           className="w-full font-medium shadow-lg hover:shadow-indigo-500/20 transition-all"
         >
-          {isLoading ? "Logowanie..." : "Zaloguj się"}
+          {isLoading ? "Signing in..." : "Sign in"}
         </Button>
 
         <div className="relative my-6">
@@ -122,7 +122,7 @@ export default function LoginPage() {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="bg-white dark:bg-gray-800 px-2 text-muted-foreground">
-              lub
+              or
             </span>
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function LoginPage() {
           href="/auth/register"
           className="block text-center text-sm font-medium text-primary hover:text-primary/80 transition-colors"
         >
-          Nie masz jeszcze konta? Zarejestruj się
+          Don&apos;t have an account? Sign up
         </Link>
       </form>
     </AuthLayout>
