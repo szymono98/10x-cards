@@ -16,6 +16,7 @@ export function TextInputArea({ value, onChange }: TextInputAreaProps) {
       <Label htmlFor="source-text">Tekst źródłowy</Label>
       <Textarea
         id="source-text"
+        data-testid="source-text-input"
         placeholder="Wklej tekst do przetworzenia (1000-10000 znaków)..."
         value={value}
         onChange={(e) => onChange(e.target.value)}

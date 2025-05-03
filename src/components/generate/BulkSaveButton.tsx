@@ -20,6 +20,9 @@ export function BulkSaveButton({
         onClick={onSaveAccepted}
         disabled={!hasAcceptedFlashcards || isLoading}
         className="flex items-center"
+        data-testid={
+          label === "Save accepted" ? "save-accepted-button" : "save-all-button"
+        }
       >
         {isLoading ? (
           <Loader2 className="w-4 h-4 mr-2 animate-spin" />

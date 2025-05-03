@@ -15,7 +15,8 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "dev:e2e": "NODE_ENV=test next dev"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.4",
@@ -48,6 +49,7 @@
     "@vitejs/plugin-react": "^4.4.1",
     "@vitest/coverage-v8": "^3.1.2",
     "@vitest/ui": "^3.1.2",
+    "dotenv": "^16.3.1",
     "eslint": "^9",
     "eslint-config-next": "15.2.5",
     "happy-dom": "^17.4.6",

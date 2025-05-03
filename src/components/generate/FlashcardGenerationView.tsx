@@ -147,6 +147,7 @@ export function FlashcardGenerationView() {
               onAccept={handleAccept}
               onReject={handleReject}
               onEdit={handleEdit}
+              data-testid="flashcards-list"
             />
             <div className="flex gap-4">
               <BulkSaveButton

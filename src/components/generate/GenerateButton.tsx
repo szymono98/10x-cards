@@ -13,7 +13,12 @@ export function GenerateButton({
   isLoading,
 }: GenerateButtonProps) {
   return (
-    <Button onClick={onClick} disabled={disabled} className="w-full sm:w-auto">
+    <Button
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full sm:w-auto"
+      data-testid="generate-flashcards-button"
+    >
       {isLoading ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />

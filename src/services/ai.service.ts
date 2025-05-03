@@ -9,7 +9,7 @@ export class AIService {
     this.apiUrl = process.env.OPENROUTER_API_URL ?? "";
   }
 
-  async generateFlashcards(sourceText: string): Promise<FlashcardProposalDto[]> {
+  async generateFlashcards(): Promise<FlashcardProposalDto[]> {
     if (!this.apiKey || !this.apiUrl) {
       throw new Error("AI service configuration missing");
     }

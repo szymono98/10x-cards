@@ -17,6 +17,7 @@ interface FlashcardItemProps {
   onAccept: () => void;
   onReject: () => void;
   onEdit: (front: string, back: string) => void;
+  "data-testid"?: string;
 }
 
 export function FlashcardItem({
@@ -24,6 +25,7 @@ export function FlashcardItem({
   onAccept,
   onReject,
   onEdit,
+  "data-testid": testId,
 }: FlashcardItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [front, setFront] = useState(proposal.front);
@@ -43,6 +45,7 @@ export function FlashcardItem({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.2 }}
+        data-testid={testId}
       >
         <Card className="hover:shadow-lg transition-shadow duration-200">
           <CardContent className="p-4 space-y-4">
@@ -53,18 +56,27 @@ export function FlashcardItem({
                   onChange={(e) => setFront(e.target.value)}
                   placeholder="Przód fiszki"
                   maxLength={200}
+                  data-testid={`${testId}-front-edit`}
                 />
                 <Textarea
                   value={back}
                   onChange={(e) => setBack(e.target.value)}
                   placeholder="Tył fiszki"
                   maxLength={500}
+                  data-testid={`${testId}-back-edit`}
                 />
               </div>
             ) : (
               <div className="space-y-2">
-                <p className="font-medium">{front}</p>
-                <p className="text-gray-600 dark:text-gray-400">{back}</p>
+                <p className="font-medium" data-testid={`${testId}-front`}>
+                  {front}
+                </p>
+                <p
+                  className="text-gray-600 dark:text-gray-400"
+                  data-testid={`${testId}-back`}
+                >
+                  {back}
+                </p>
               </div>
             )}
 
@@ -72,7 +84,12 @@ export function FlashcardItem({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="sm" onClick={handleEdit}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleEdit}
+                      data-testid={`${testId}-edit-button`}
+                    >
                       <Edit2 className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -88,6 +105,7 @@ export function FlashcardItem({
                       size="sm"
                       onClick={onReject}
                       className="text-red-600 hover:text-red-700"
+                      data-testid={`${testId}-reject-button`}
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -104,6 +122,7 @@ export function FlashcardItem({
                       size="sm"
                       onClick={onAccept}
                       className="text-green-600 hover:text-green-700"
+                      data-testid={`${testId}-accept-button`}
                     >
                       <Check className="h-4 w-4" />
                     </Button>
