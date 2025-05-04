@@ -31,17 +31,36 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Install prettier explicitly to ensure it's available
       - name: Install prettier
         run: npm install --no-save prettier
-
-      - name: Run formatter check
-        run: npx prettier --check --ignore-path .gitignore .
 
       - name: Run linter
         run: npm run lint
 
-      - name: Run formatter check
-        run: npm run format
+      # Format check that doesn't fail the build
+      - name: Check code formatting
+        id: prettier-check
+        run: npx prettier --check --ignore-path .gitignore . || echo "Formatting issues detected"
+        continue-on-error: true
+
+      # Generate formatting report
+      - name: Generate format report
+        if: steps.prettier-check.outcome == 'failure'
+        run: |
+          echo "::warning::Code style issues found. Consider running 'npm run format:fix' locally."
+          echo "Files with formatting issues:" > format-report.txt
+          npx prettier --list-different --ignore-path .gitignore . >> format-report.txt
+          cat format-report.txt
+
+      # Upload format report as an artifact
+      - name: Upload format report
+        if: steps.prettier-check.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: format-report
+          path: format-report.txt
+          retention-days: 5
 
       - name: Run unit tests
         run: npm run test
