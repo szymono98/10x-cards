@@ -34,7 +34,7 @@ export class FlashcardItem {
   async getText() {
     return {
       front: await this.frontText.textContent(),
-      back: await this.backText.textContent()
+      back: await this.backText.textContent(),
     };
   }
 

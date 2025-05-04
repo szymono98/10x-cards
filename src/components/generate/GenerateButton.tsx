@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { Loader2, Wand2 } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Loader2, Wand2 } from 'lucide-react';
 
 interface GenerateButtonProps {
   onClick: () => Promise<void>;
@@ -7,11 +7,7 @@ interface GenerateButtonProps {
   isLoading: boolean;
 }
 
-export function GenerateButton({
-  onClick,
-  disabled,
-  isLoading,
-}: GenerateButtonProps) {
+export function GenerateButton({ onClick, disabled, isLoading }: GenerateButtonProps) {
   return (
     <Button
       onClick={onClick}

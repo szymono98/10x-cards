@@ -25,7 +25,7 @@ export interface ResponseFormat {
     name: string;
     strict: true;
     schema: Record<string, unknown>;
-  }
+  };
 }
 
 export interface ChatResponse {

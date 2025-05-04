@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: "npm"
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -37,6 +37,10 @@ jobs:
 
       - name: Run linter
         run: npm run lint
+
+      # Auto-format code instead of just checking
+      - name: Format code
+        run: npx prettier --write --ignore-path .gitignore .
 
       # Format check that doesn't fail the build
       - name: Check code formatting
@@ -89,7 +93,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: "npm"
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci

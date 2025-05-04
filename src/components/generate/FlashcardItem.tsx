@@ -1,23 +1,18 @@
-import { useState, useCallback } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Check, X, Edit2 } from "lucide-react";
-import type { FlashcardProposalDto } from "@/types";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useState, useCallback } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Check, X, Edit2 } from 'lucide-react';
+import type { FlashcardProposalDto } from '@/types';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FlashcardItemProps {
   proposal: FlashcardProposalDto;
   onAccept: () => void;
   onReject: () => void;
   onEdit: (front: string, back: string) => void;
-  "data-testid"?: string;
+  'data-testid'?: string;
 }
 
 export function FlashcardItem({
@@ -25,7 +20,7 @@ export function FlashcardItem({
   onAccept,
   onReject,
   onEdit,
-  "data-testid": testId,
+  'data-testid': testId,
 }: FlashcardItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [front, setFront] = useState(proposal.front);
@@ -71,10 +66,7 @@ export function FlashcardItem({
                 <p className="font-medium" data-testid={`${testId}-front`}>
                   {front}
                 </p>
-                <p
-                  className="text-gray-600 dark:text-gray-400"
-                  data-testid={`${testId}-back`}
-                >
+                <p className="text-gray-600 dark:text-gray-400" data-testid={`${testId}-back`}>
                   {back}
                 </p>
               </div>

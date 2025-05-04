@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { AuthInput } from "@/components/auth/AuthInput";
-import AuthLayout from "@/components/layouts/AuthLayout";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Button } from '@/components/ui/button';
+import { AuthInput } from '@/components/auth/AuthInput';
+import AuthLayout from '@/components/layouts/AuthLayout';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 interface ResetPasswordFormData {
   email: string;
@@ -32,7 +32,7 @@ export default function ResetPasswordPage() {
       });
 
       if (error) {
-        setError("root", {
+        setError('root', {
           message: `Error while sending link: ${error.message}`,
         });
         return;
@@ -40,9 +40,9 @@ export default function ResetPasswordPage() {
 
       setIsSubmitted(true);
     } catch (error) {
-      console.error("Reset password error:", error);
-      setError("root", {
-        message: "An unexpected error occurred during password reset",
+      console.error('Reset password error:', error);
+      setError('root', {
+        message: 'An unexpected error occurred during password reset',
       });
     } finally {
       setIsLoading(false);
@@ -53,13 +53,13 @@ export default function ResetPasswordPage() {
     return (
       <AuthLayout
         title="Check your email"
-        subtitle="If an account exists with this email, we&apos;ll send you a password reset link."
+        subtitle="If an account exists with this email, we'll send you a password reset link."
       >
         <div className="text-center space-y-4">
           <p className="text-muted-foreground">
-            Click the link we just sent to your email address to set a new password.
-            The link will be active for 24 hours. If you don&apos;t receive the email,
-            please check your spam folder.
+            Click the link we just sent to your email address to set a new password. The link will
+            be active for 24 hours. If you don&apos;t receive the email, please check your spam
+            folder.
           </p>
           <Link
             href="/auth/login"
@@ -83,18 +83,18 @@ export default function ResetPasswordPage() {
           label="Email"
           type="email"
           autoComplete="email"
-          registration={register("email", {
-            required: "Email is required",
+          registration={register('email', {
+            required: 'Email is required',
             pattern: {
               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Invalid email format",
+              message: 'Invalid email format',
             },
           })}
           error={errors.email?.message}
         />
 
         <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "Sending..." : "Send reset link"}
+          {isLoading ? 'Sending...' : 'Send reset link'}
         </Button>
       </form>
     </AuthLayout>

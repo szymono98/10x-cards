@@ -107,25 +107,25 @@ test("submits the form with user data", async () => {
 
 ```typescript
 // Good example:
-test("user can generate and save flashcards", async ({ page }) => {
-  await page.goto("/generate");
+test('user can generate and save flashcards', async ({ page }) => {
+  await page.goto('/generate');
 
   // Fill the form
-  await page.getByLabel("Topic").fill("React Hooks");
-  await page.getByRole("button", { name: "Generate" }).click();
+  await page.getByLabel('Topic').fill('React Hooks');
+  await page.getByRole('button', { name: 'Generate' }).click();
 
   // Wait for generation to complete
-  await page.waitForSelector(".flashcard-item");
+  await page.waitForSelector('.flashcard-item');
 
   // Verify results
-  const flashcards = await page.locator(".flashcard-item").count();
+  const flashcards = await page.locator('.flashcard-item').count();
   expect(flashcards).toBeGreaterThan(0);
 
   // Save flashcards
-  await page.getByRole("button", { name: "Save All" }).click();
+  await page.getByRole('button', { name: 'Save All' }).click();
 
   // Verify save confirmation
-  await expect(page.getByText("Flashcards saved successfully")).toBeVisible();
+  await expect(page.getByText('Flashcards saved successfully')).toBeVisible();
 
   // Check accessibility
   const accessibilityScanResults = await new AxeBuilder({ page }).analyze();

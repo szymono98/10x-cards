@@ -55,15 +55,15 @@ export class FlashcardGenerationPage {
   }
 
   async isGenerateButtonEnabled() {
-    return !await this.generateButton.isDisabled();
+    return !(await this.generateButton.isDisabled());
   }
 
   async isSaveAcceptedButtonEnabled() {
-    return !await this.saveAcceptedButton.isDisabled();
+    return !(await this.saveAcceptedButton.isDisabled());
   }
 
   async isSaveAllButtonEnabled() {
-    return !await this.saveAllButton.isDisabled();
+    return !(await this.saveAllButton.isDisabled());
   }
 
   // Scenariusze złożone

@@ -1,8 +1,12 @@
 import { createHash } from 'crypto';
-import { supabaseClient, DEFAULT_USER_ID } from "@/db/supabase.client";
-import { GenerateFlashcardsCommand, GenerationCreateResponseDto, FlashcardProposalDto } from "@/types";
+import { supabaseClient, DEFAULT_USER_ID } from '@/db/supabase.client';
+import {
+  GenerateFlashcardsCommand,
+  GenerationCreateResponseDto,
+  FlashcardProposalDto,
+} from '@/types';
 import { OpenRouterService } from '@/lib/openrouter.service';
-import {  FlashcardLLMResponse } from '@/lib/openrouter.types';
+import { FlashcardLLMResponse } from '@/lib/openrouter.types';
 
 class GenerationsService {
   private openRouter: OpenRouterService;
@@ -16,7 +20,7 @@ class GenerationsService {
     this.openRouter = OpenRouterService.getInstance({
       apiKey,
       defaultModel: 'openai/gpt-4o-mini',
-      defaultTemperature: 0.7
+      defaultTemperature: 0.7,
     });
   }
 
@@ -45,7 +49,7 @@ class GenerationsService {
           generated_count: 0,
           generation_duration: 0,
           accepted_edited_count: 0,
-          accepted_unedited_count: 0
+          accepted_unedited_count: 0,
         })
         .select('*')
         .single();
@@ -55,8 +59,11 @@ class GenerationsService {
 
       const response = await this.openRouter.chatCompletion({
         messages: [
-          { role: 'system', content: this.buildSystemPrompt(command.source_text) },
-          { role: 'user', content: 'Generate flashcards based on given text.' }
+          {
+            role: 'system',
+            content: this.buildSystemPrompt(command.source_text),
+          },
+          { role: 'user', content: 'Generate flashcards based on given text.' },
         ],
         responseFormat: {
           type: 'json_schema',
@@ -76,14 +83,14 @@ class GenerationsService {
                     additionalProperties: false,
                     properties: {
                       front: { type: 'string' },
-                      back: { type: 'string' }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+                      back: { type: 'string' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
 
       if (!response.choices || response.choices.length === 0) {
@@ -102,31 +109,30 @@ class GenerationsService {
           throw new Error('Unexpected response format from AI model');
         }
       } catch (error) {
-        throw error instanceof Error
+        throw error instanceof Error;
       }
 
-      const proposals: FlashcardProposalDto[] = parsedContent.flashcards.map(card => ({
+      const proposals: FlashcardProposalDto[] = parsedContent.flashcards.map((card) => ({
         front: card.front,
         back: card.back,
-        source: 'ai-full'
+        source: 'ai-full',
       }));
 
       const generationDuration = Date.now() - startTime;
 
       await supabaseClient
         .from('generations')
-        .update({ 
+        .update({
           generated_count: proposals.length,
-          generation_duration: generationDuration
+          generation_duration: generationDuration,
         })
         .eq('id', generation.id);
 
       return {
         generation_id: generation.id,
         flashcards_proposals: proposals,
-        generated_count: proposals.length
+        generated_count: proposals.length,
       };
-
     } catch (error) {
       console.error('Error content: ', error);
       throw error;

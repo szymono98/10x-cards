@@ -4,16 +4,20 @@ import { FlashcardGenerationPage } from '../page-objects/generate/FlashcardGener
 test.describe('Flashcard Generation', () => {
   test.beforeEach(async ({ page }) => {
     // Mock the generations endpoint
-    await page.route('/api/generations', async route => {
+    await page.route('/api/generations', async (route) => {
       const request = route.request();
       if (request.method() === 'POST') {
-        const body = JSON.parse(await request.postData() || '{}');
-        
+        const body = JSON.parse((await request.postData()) || '{}');
+
         // Validate the source text length
-        if (!body.source_text || body.source_text.length < 1000 || body.source_text.length > 10000) {
-          await route.fulfill({ 
+        if (
+          !body.source_text ||
+          body.source_text.length < 1000 ||
+          body.source_text.length > 10000
+        ) {
+          await route.fulfill({
             status: 400,
-            body: JSON.stringify({ error: 'Invalid source text length' })
+            body: JSON.stringify({ error: 'Invalid source text length' }),
           });
           return;
         }
@@ -25,18 +29,18 @@ test.describe('Flashcard Generation', () => {
             generation_id: 1,
             flashcards_proposals: [
               {
-                front: "What is the main purpose of the text?",
-                back: "The text demonstrates character length validation.",
-                source: "ai-full"
+                front: 'What is the main purpose of the text?',
+                back: 'The text demonstrates character length validation.',
+                source: 'ai-full',
               },
               {
-                front: "What is the minimum text length required?",
-                back: "The minimum text length required is 1000 characters.",
-                source: "ai-full"
-              }
+                front: 'What is the minimum text length required?',
+                back: 'The minimum text length required is 1000 characters.',
+                source: 'ai-full',
+              },
             ],
-            generated_count: 2
-          })
+            generated_count: 2,
+          }),
         });
       }
     });
@@ -51,10 +55,10 @@ test.describe('Flashcard Generation', () => {
 
     // Act
     await page.goto('/generate');
-    
+
     // Generowanie fiszek
     await flashcardPage.generateFlashcards(sampleText);
-    
+
     // Weryfikacja czy lista fiszek się pojawiła
     await expect(page.getByTestId('flashcards-list')).toBeVisible();
 
@@ -68,10 +72,10 @@ test.describe('Flashcard Generation', () => {
     // Assert
     // Sprawdzenie czy pojawił się komunikat o sukcesie
     await expect(page.getByText('Flashcards are saved successfully')).toBeVisible();
-    
+
     // Sprawdzenie czy lista fiszek została wyczyszczona po zapisie
     await expect(page.getByTestId('flashcards-list')).not.toBeVisible();
-    
+
     // Sprawdzenie czy pole tekstowe zostało wyczyszczone
     const sourceTextInput = page.getByTestId('source-text-input');
     await expect(sourceTextInput).toHaveValue('');
@@ -105,10 +109,10 @@ test.describe('Flashcard Generation', () => {
     await page.goto('/generate');
 
     // Override the mock for this specific test
-    await page.route('/api/generations', async route => {
+    await page.route('/api/generations', async (route) => {
       await route.fulfill({
         status: 500,
-        body: JSON.stringify({ error: 'Server error during generation' })
+        body: JSON.stringify({ error: 'Server error during generation' }),
       });
     });
 
@@ -117,8 +121,10 @@ test.describe('Flashcard Generation', () => {
     await flashcardPage.clickGenerate();
 
     // Assert - check for error notification instead of flashcards list
-    await expect(page.getByText('Server error during generation')).toBeVisible({ timeout: 10000 });
-    
+    await expect(page.getByText('Server error during generation')).toBeVisible({
+      timeout: 10000,
+    });
+
     // Verify flashcards list is not visible
     await expect(page.getByTestId('flashcards-list')).not.toBeVisible();
   });

@@ -13,15 +13,15 @@ describe('useGenerateFlashcards', () => {
         {
           front: 'What is TypeScript?',
           back: 'A strongly typed programming language that builds on JavaScript',
-          source: 'ai-full'
+          source: 'ai-full',
         },
         {
           front: 'What is TailwindCSS?',
           back: 'A utility-first CSS framework',
-          source: 'ai-full'
+          source: 'ai-full',
         },
       ],
-      generated_count: 2
+      generated_count: 2,
     };
 
     // Set up the MSW handler for this specific test
@@ -36,7 +36,9 @@ describe('useGenerateFlashcards', () => {
 
     // Call the generate function with proper GenerateFlashcardsCommand object
     await act(async () => {
-      await result.current.generate({ source_text: 'React and TypeScript basics' });
+      await result.current.generate({
+        source_text: 'React and TypeScript basics',
+      });
     });
 
     // Assert that the loading state is turned off
@@ -48,10 +50,7 @@ describe('useGenerateFlashcards', () => {
     // Mock an error response
     server.use(
       http.post('/api/generations', () => {
-        return HttpResponse.json(
-          { error: 'Failed to generate flashcards' },
-          { status: 500 }
-        );
+        return HttpResponse.json({ error: 'Failed to generate flashcards' }, { status: 500 });
       })
     );
 
@@ -62,7 +61,9 @@ describe('useGenerateFlashcards', () => {
     let error;
     await act(async () => {
       try {
-        await result.current.generate({ source_text: 'React and TypeScript basics' });
+        await result.current.generate({
+          source_text: 'React and TypeScript basics',
+        });
       } catch (e) {
         error = e;
       }

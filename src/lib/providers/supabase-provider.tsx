@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import type { SupabaseClient } from "@supabase/auth-helpers-nextjs";
-import type { User } from "@supabase/auth-helpers-nextjs";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import type { SupabaseClient } from '@supabase/auth-helpers-nextjs';
+import type { User } from '@supabase/auth-helpers-nextjs';
 
 type SupabaseContext = {
   supabase: SupabaseClient;
@@ -26,15 +26,13 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, [supabase]);
 
-  return (
-    <Context.Provider value={{ supabase, user }}>{children}</Context.Provider>
-  );
+  return <Context.Provider value={{ supabase, user }}>{children}</Context.Provider>;
 }
 
 export const useSupabase = () => {
   const context = useContext(Context);
   if (context === undefined) {
-    throw new Error("useSupabase must be used inside SupabaseProvider");
+    throw new Error('useSupabase must be used inside SupabaseProvider');
   }
   return context;
 };

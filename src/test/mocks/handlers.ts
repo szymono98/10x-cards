@@ -25,17 +25,17 @@ export const handlers = [
   http.get('/api/flashcards', () => {
     return HttpResponse.json(mockFlashcards);
   }),
-  
+
   // POST flashcards
   http.post('/api/flashcards', async ({ request }) => {
-    const newFlashcard = await request.json() as FlashcardsCreateCommand;
-    return HttpResponse.json({ 
-      ...newFlashcard, 
+    const newFlashcard = (await request.json()) as FlashcardsCreateCommand;
+    return HttpResponse.json({
+      ...newFlashcard,
       id: `mock-${Date.now()}`,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     });
   }),
-  
+
   // Mock your AI generation endpoint
   http.post('/api/generations', async () => {
     return HttpResponse.json({
@@ -44,15 +44,15 @@ export const handlers = [
         {
           front: 'What is TypeScript?',
           back: 'A strongly typed programming language that builds on JavaScript',
-          source: 'ai-full'
+          source: 'ai-full',
         },
         {
           front: 'What is TailwindCSS?',
           back: 'A utility-first CSS framework',
-          source: 'ai-full'
+          source: 'ai-full',
         },
       ],
-      generated_count: 2
+      generated_count: 2,
     } as GenerationCreateResponseDto);
   }),
 ];

@@ -1,5 +1,5 @@
-import { supabaseClient } from "@/db/supabase.client";
-import { FlashcardsCreateCommand, FlashcardDto } from "@/types";
+import { supabaseClient } from '@/db/supabase.client';
+import { FlashcardsCreateCommand, FlashcardDto } from '@/types';
 
 class FlashcardsService {
   async create(command: FlashcardsCreateCommand): Promise<FlashcardDto[]> {

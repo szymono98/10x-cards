@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { AuthInput } from "@/components/auth/AuthInput";
-import AuthLayout from "@/components/layouts/AuthLayout";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useRouter } from "next/navigation";
+import { Button } from '@/components/ui/button';
+import { AuthInput } from '@/components/auth/AuthInput';
+import AuthLayout from '@/components/layouts/AuthLayout';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
 
 interface LoginFormData {
   email: string;
@@ -34,25 +34,24 @@ export default function LoginPage() {
       });
 
       if (error) {
-        if (error.message === "Invalid login credentials") {
-          setError("root", {
-            message:
-              "Invalid email or password. If you don't have an account yet, sign up.",
+        if (error.message === 'Invalid login credentials') {
+          setError('root', {
+            message: "Invalid email or password. If you don't have an account yet, sign up.",
           });
         } else {
-          setError("root", {
+          setError('root', {
             message: `An error occurred during login: ${error.message}`,
           });
         }
         return;
       }
 
-      router.push("/generate");
+      router.push('/generate');
       router.refresh();
     } catch (error) {
-      console.error("Login error:", error);
-      setError("root", {
-        message: "An unexpected error occurred during login",
+      console.error('Login error:', error);
+      setError('root', {
+        message: 'An unexpected error occurred during login',
       });
     } finally {
       setIsLoading(false);
@@ -71,11 +70,11 @@ export default function LoginPage() {
             label="Email"
             type="email"
             autoComplete="email"
-            registration={register("email", {
-              required: "Email is required",
+            registration={register('email', {
+              required: 'Email is required',
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Invalid email format",
+                message: 'Invalid email format',
               },
             })}
             error={errors.email?.message}
@@ -86,8 +85,8 @@ export default function LoginPage() {
             label="Password"
             type="password"
             autoComplete="current-password"
-            registration={register("password", {
-              required: "Password is required",
+            registration={register('password', {
+              required: 'Password is required',
             })}
             error={errors.password?.message}
           />
@@ -113,7 +112,7 @@ export default function LoginPage() {
           disabled={isLoading}
           className="w-full font-medium shadow-lg hover:shadow-indigo-500/20 transition-all"
         >
-          {isLoading ? "Signing in..." : "Sign in"}
+          {isLoading ? 'Signing in...' : 'Sign in'}
         </Button>
 
         <div className="relative my-6">
@@ -121,9 +120,7 @@ export default function LoginPage() {
             <div className="w-full border-t border-gray-200 dark:border-gray-700" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-white dark:bg-gray-800 px-2 text-muted-foreground">
-              or
-            </span>
+            <span className="bg-white dark:bg-gray-800 px-2 text-muted-foreground">or</span>
           </div>
         </div>
 

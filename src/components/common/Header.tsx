@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useSupabase } from "@/lib/providers/supabase-provider";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useSupabase } from '@/lib/providers/supabase-provider';
 
 export function Header() {
   const router = useRouter();
@@ -15,10 +15,10 @@ export function Header() {
     try {
       setIsLoading(true);
       await supabase.auth.signOut();
-      router.push("/");
+      router.push('/');
       router.refresh();
     } catch (error) {
-      console.error("Error logging out:", error);
+      console.error('Error logging out:', error);
     } finally {
       setIsLoading(false);
     }
@@ -43,12 +43,8 @@ export function Header() {
               <Button variant="ghost" asChild>
                 <Link href="/profile">Profile</Link>
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleLogout}
-                disabled={isLoading}
-              >
-                {isLoading ? "Logging out..." : "Logout"}
+              <Button variant="outline" onClick={handleLogout} disabled={isLoading}>
+                {isLoading ? 'Logging out...' : 'Logout'}
               </Button>
             </>
           ) : (

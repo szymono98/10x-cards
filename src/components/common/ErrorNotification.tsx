@@ -1,6 +1,6 @@
-import { XCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { memo } from "react";
+import { XCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { memo } from 'react';
 
 interface ErrorNotificationProps {
   title?: string;
@@ -8,7 +8,7 @@ interface ErrorNotificationProps {
 }
 
 export const ErrorNotification = memo(function ErrorNotification({
-  title = "An error occurred",
+  title = 'An error occurred',
   message,
 }: ErrorNotificationProps) {
   if (!message) return null;

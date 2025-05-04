@@ -87,10 +87,10 @@ interface RequestPayload {
 
 ```typescript
 enum ErrorType {
-  NETWORK_ERROR = "NETWORK_ERROR",
-  AUTH_ERROR = "AUTH_ERROR",
-  VALIDATION_ERROR = "VALIDATION_ERROR",
-  RATE_LIMIT_ERROR = "RATE_LIMIT_ERROR",
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  AUTH_ERROR = 'AUTH_ERROR',
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  RATE_LIMIT_ERROR = 'RATE_LIMIT_ERROR',
 }
 ```
 
@@ -105,12 +105,12 @@ enum ErrorType {
 ```typescript
 const chatManager = new ChatManager({
   apiKey: process.env.OPENROUTER_API_KEY,
-  model: "gpt-3.5-turbo",
-  systemPrompt: "Jesteś pomocnym asystentem.",
+  model: 'gpt-3.5-turbo',
+  systemPrompt: 'Jesteś pomocnym asystentem.',
 });
 
 try {
-  const response = await chatManager.sendMessage("Podsumuj główne punkty.");
+  const response = await chatManager.sendMessage('Podsumuj główne punkty.');
   console.log(response.content);
 } catch (error) {
   if (error instanceof RateLimitError) {

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useTransition } from "react";
-import { TextInputArea } from "@/components/generate/TextInputArea";
-import { GenerateButton } from "@/components/generate/GenerateButton";
-import type { GenerateFlashcardsCommand, FlashcardProposalDto } from "@/types";
-import { useGenerateFlashcards } from "@/hooks/useGenerateFlashcards";
-import { FlashcardList } from "./FlashcardList";
-import { BulkSaveButton } from "@/components/generate/BulkSaveButton";
-import { ErrorNotification } from "@/components/common/ErrorNotification";
-import { useSaveFlashcards } from "@/hooks/useSaveFlashcards";
-import { SuccessNotification } from "@/components/common/SuccessNotification";
+import { useState, useCallback, useTransition } from 'react';
+import { TextInputArea } from '@/components/generate/TextInputArea';
+import { GenerateButton } from '@/components/generate/GenerateButton';
+import type { GenerateFlashcardsCommand, FlashcardProposalDto } from '@/types';
+import { useGenerateFlashcards } from '@/hooks/useGenerateFlashcards';
+import { FlashcardList } from './FlashcardList';
+import { BulkSaveButton } from '@/components/generate/BulkSaveButton';
+import { ErrorNotification } from '@/components/common/ErrorNotification';
+import { useSaveFlashcards } from '@/hooks/useSaveFlashcards';
+import { SuccessNotification } from '@/components/common/SuccessNotification';
 
 interface FlashcardProposalWithStatus extends FlashcardProposalDto {
   accepted: boolean;
@@ -17,7 +17,7 @@ interface FlashcardProposalWithStatus extends FlashcardProposalDto {
 }
 
 export function FlashcardGenerationView() {
-  const [text, setText] = useState("");
+  const [text, setText] = useState('');
   const { generate, isLoading, error } = useGenerateFlashcards();
   const [proposals, setProposals] = useState<FlashcardProposalWithStatus[]>([]);
   const [generationId, setGenerationId] = useState<number | null>(null);
@@ -43,7 +43,7 @@ export function FlashcardGenerationView() {
         }))
       );
     } catch (error) {
-      console.error("Failed to generate flashcards:", error);
+      console.error('Failed to generate flashcards:', error);
     }
   };
 
@@ -59,16 +59,13 @@ export function FlashcardGenerationView() {
     setProposals((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
-  const handleEdit = useCallback(
-    (index: number, front: string, back: string) => {
-      setProposals((prev) =>
-        prev.map((proposal, i) =>
-          i === index ? { ...proposal, front, back, edited: true } : proposal
-        )
-      );
-    },
-    []
-  );
+  const handleEdit = useCallback((index: number, front: string, back: string) => {
+    setProposals((prev) =>
+      prev.map((proposal, i) =>
+        i === index ? { ...proposal, front, back, edited: true } : proposal
+      )
+    );
+  }, []);
 
   const handleSaveAccepted = useCallback(async () => {
     if (!generationId) return;
@@ -79,20 +76,20 @@ export function FlashcardGenerationView() {
       .map((p) => ({
         front: p.front,
         back: p.back,
-        source: p.edited ? ("ai-edited" as const) : ("ai-full" as const),
+        source: p.edited ? ('ai-edited' as const) : ('ai-full' as const),
         generation_id: generationId,
       }));
 
     try {
       await save({ flashcards: acceptedFlashcards });
       startTransition(() => {
-        setSuccess("Flashcards are saved successfully");
+        setSuccess('Flashcards are saved successfully');
         setProposals([]);
         setGenerationId(null);
-        setText("");
+        setText('');
       });
     } catch (error) {
-      console.error("Failed to save flashcards:", error);
+      console.error('Failed to save flashcards:', error);
       setSuccess(null);
       throw error;
     }
@@ -105,20 +102,20 @@ export function FlashcardGenerationView() {
     const allFlashcards = proposals.map((p) => ({
       front: p.front,
       back: p.back,
-      source: p.edited ? ("ai-edited" as const) : ("ai-full" as const),
+      source: p.edited ? ('ai-edited' as const) : ('ai-full' as const),
       generation_id: generationId,
     }));
 
     try {
       await save({ flashcards: allFlashcards });
       startTransition(() => {
-        setSuccess("All flashcards are saved successfully");
+        setSuccess('All flashcards are saved successfully');
         setProposals([]);
         setGenerationId(null);
-        setText("");
+        setText('');
       });
     } catch (error) {
-      console.error("Failed to save flashcards:", error);
+      console.error('Failed to save flashcards:', error);
       setSuccess(null);
       throw error;
     }
@@ -131,14 +128,10 @@ export function FlashcardGenerationView() {
         <TextInputArea value={text} onChange={setText} />
         <GenerateButton
           onClick={handleGenerate}
-          disabled={
-            !text || text.length < 1000 || text.length > 10000 || isLoading
-          }
+          disabled={!text || text.length < 1000 || text.length > 10000 || isLoading}
           isLoading={isLoading}
         />
-        {(error || saveError) && (
-          <ErrorNotification message={error || saveError || ""} />
-        )}
+        {(error || saveError) && <ErrorNotification message={error || saveError || ''} />}
         {success && <SuccessNotification message={success} />}
         {proposals.length > 0 && (
           <>

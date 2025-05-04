@@ -1,5 +1,5 @@
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface TextInputAreaProps {
   value: string;
@@ -20,19 +20,11 @@ export function TextInputArea({ value, onChange }: TextInputAreaProps) {
         placeholder="Paste your text for processing (1000-10000 characters)..."
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`min-h-[200px] ${
-          charCount > 0 && !isValid ? "border-red-500" : ""
-        }`}
+        className={`min-h-[200px] ${charCount > 0 && !isValid ? 'border-red-500' : ''}`}
       />
-      <div
-        className={`text-sm ${
-          charCount > 0 && !isValid ? "text-red-500" : "text-gray-500"
-        }`}
-      >
-        {charCount}/10000 characters{" "}
-        {remainingChars >= 0
-          ? `(${remainingChars} remaining)`
-          : "(limit exceeded)"}
+      <div className={`text-sm ${charCount > 0 && !isValid ? 'text-red-500' : 'text-gray-500'}`}>
+        {charCount}/10000 characters{' '}
+        {remainingChars >= 0 ? `(${remainingChars} remaining)` : '(limit exceeded)'}
       </div>
     </div>
   );

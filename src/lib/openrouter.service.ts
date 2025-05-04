@@ -1,4 +1,10 @@
-import { OpenRouterConfig, ChatRequest, ChatResponse, RetryOptions, OpenRouterError } from './openrouter.types';
+import {
+  OpenRouterConfig,
+  ChatRequest,
+  ChatResponse,
+  RetryOptions,
+  OpenRouterError,
+} from './openrouter.types';
 
 export class OpenRouterService {
   private static instance: OpenRouterService;
@@ -13,7 +19,7 @@ export class OpenRouterService {
     if (!config.apiKey) {
       throw new Error('OpenRouter API key is required!');
     }
-    
+
     this.apiKey = config.apiKey;
     this.baseUrl = config.baseUrl ?? 'https://openrouter.ai/api/v1';
     this.defaultModel = config.defaultModel;
@@ -57,12 +63,16 @@ export class OpenRouterService {
     try {
       return await this.executeRequest(endpoint, payload);
     } catch (error) {
-      if (error instanceof OpenRouterError && error.retryable && attempt < this.retryOptions.maxAttempts) {
+      if (
+        error instanceof OpenRouterError &&
+        error.retryable &&
+        attempt < this.retryOptions.maxAttempts
+      ) {
         const delay = Math.min(
           this.retryOptions.initialDelay * Math.pow(this.retryOptions.backoffFactor, attempt - 1),
           this.retryOptions.maxDelay
         );
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return this.executeRequestWithRetry(endpoint, payload, attempt + 1);
       }
       throw error;
@@ -74,7 +84,7 @@ export class OpenRouterService {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
@@ -94,7 +104,7 @@ export class OpenRouterService {
   private async handleErrorResponse(response: Response): Promise<never> {
     const status = response.status;
     const data = await response.json().catch(() => ({}));
-    
+
     switch (status) {
       case 401:
         throw new OpenRouterError('Authentication failed', 'AUTH_ERROR', status, false);
@@ -118,7 +128,7 @@ export class OpenRouterService {
       return data as ChatResponse;
     } catch (error) {
       throw new OpenRouterError(
-        error as string || 'Failed to parse response',
+        (error as string) || 'Failed to parse response',
         'PARSE_ERROR',
         undefined,
         false

@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import Link from "next/link";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { ReactNode } from 'react';
+import Link from 'next/link';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -8,11 +8,7 @@ interface AuthLayoutProps {
   subtitle?: string;
 }
 
-export default function AuthLayout({
-  children,
-  title,
-  subtitle,
-}: AuthLayoutProps) {
+export default function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
       <div className="container px-4 py-8">
@@ -29,9 +25,7 @@ export default function AuthLayout({
               </Link>
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
-                {subtitle && (
-                  <p className="text-sm text-muted-foreground">{subtitle}</p>
-                )}
+                {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
               </div>
             </CardHeader>
             <CardContent>{children}</CardContent>

@@ -17,7 +17,7 @@ const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
   {
-    auth: { persistSession: false }
+    auth: { persistSession: false },
   }
 );
 
@@ -27,7 +27,7 @@ export async function teardownTestDatabase() {
     await supabase.from('flashcards').delete().neq('id', 0);
     await supabase.from('generation_error_logs').delete().neq('id', 0);
     await supabase.from('generations').delete().neq('id', 0);
-    
+
     console.log('Test database teardown completed successfully');
   } catch (error) {
     console.error('Error during test database teardown:', error);
