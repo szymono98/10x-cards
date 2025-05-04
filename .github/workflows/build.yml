@@ -31,6 +31,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Dodane kroki diagnostyczne
+      - name: Verify installed modules
+        run: |
+          echo "Checking for tailwindcss module..."
+          npm list tailwindcss || true
+          echo "Checking PostCSS module..."
+          npm list postcss || true
+          echo "Checking Node modules directory..."
+          ls -la node_modules || true
+
       # Install prettier explicitly to ensure it's available
       - name: Install prettier
         run: npm install --no-save prettier
@@ -66,7 +76,6 @@ jobs:
           path: format-report.txt
           retention-days: 5
 
-      # Zmieniony krok - uruchamiam testy z generowaniem pokrycia
       - name: Run unit tests with coverage
         run: npm run test:coverage
 
@@ -100,6 +109,16 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # Dodany krok diagnostyczny przed buildowaniem
+      - name: Verify tailwindcss installation
+        run: |
+          echo "Checking for tailwindcss module..."
+          npm list tailwindcss || true
+          echo "Content of PostCSS config:"
+          cat postcss.config.mjs
+          echo "Content of Tailwind config:"
+          cat tailwind.config.ts
 
       - name: Build production
         run: npm run build
