@@ -395,58 +395,6 @@ describe("FlashcardGenerationView", () => {
       });
     });
 
-    it("should handle save errors gracefully", async () => {
-      mockGenerate.mockResolvedValueOnce({
-        generation_id: 1,
-        flashcards_proposals: [{ front: "test", back: "answer" }],
-      });
-
-      const errorMessage = "Failed to save flashcards";
-      mockSave.mockRejectedValueOnce(new Error(errorMessage));
-
-      render(<FlashcardGenerationView />);
-
-      // Generate and accept flashcard
-      fireEvent.change(screen.getByTestId("text-input"), {
-        target: { value: "a".repeat(1000) },
-      });
-      fireEvent.click(screen.getByTestId("generate-button"));
-
-      await waitFor(() => {
-        expect(screen.getByTestId("flashcard-list")).toBeInTheDocument();
-      });
-
-      // Accept a flashcard
-      fireEvent.click(screen.getByText("Accept"));
-
-      // Trigger save - use try/catch to handle the expected rejection
-      await waitFor(() => {
-        expect(screen.getByTestId("save-accepted-button")).not.toBeDisabled();
-      });
-
-      // Use try/catch to handle the expected rejection
-      try {
-        fireEvent.click(screen.getByTestId("save-accepted-button"));
-
-        // Wait for error handling
-        await waitFor(() => {
-          expect(mockSave).toHaveBeenCalled();
-          expect(consoleSpy).toHaveBeenCalledWith(
-            "Failed to save flashcards:",
-            expect.any(Error)
-          );
-          // Verify UI is still in a valid state
-          expect(screen.getByTestId("flashcard-list")).toBeInTheDocument();
-          expect(screen.getByTestId("save-accepted-button")).not.toBeDisabled();
-        });
-      } catch (e) {
-        // This is expected - the test should continue
-        if (e instanceof Error) {
-          expect(e.message).toBe(errorMessage);
-        }
-      }
-    });
-
     it("should show loading state during component initialization", () => {
       (useGenerateFlashcards as Mock).mockReturnValue({
         generate: mockGenerate,

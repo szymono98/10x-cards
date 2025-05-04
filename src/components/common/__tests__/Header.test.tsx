@@ -1,9 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Header } from "../Header";
-import { createContext, ReactNode } from "react";
 
-// Mock the NextJS router
+// Mock modules before importing components
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -12,42 +11,17 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-// Mock the Supabase provider context
-vi.mock("@/lib/providers/supabase-provider", () => {
-  const SupabaseContext = createContext({
+// Fix the Supabase provider mock to avoid hoisting issues
+vi.mock("@/lib/providers/supabase-provider", () => ({
+  useSupabase: () => ({
     supabase: {
       auth: {
         signOut: vi.fn().mockResolvedValue({}),
       },
     },
     user: null,
-  });
-
-  return {
-    useSupabase: () => ({
-      supabase: {
-        auth: {
-          signOut: vi.fn().mockResolvedValue({}),
-        },
-      },
-      user: null,
-    }),
-    SupabaseProvider: ({ children }: { children: ReactNode }) => (
-      <SupabaseContext.Provider
-        value={{
-          supabase: {
-            auth: {
-              signOut: vi.fn().mockResolvedValue({}),
-            },
-          },
-          user: null,
-        }}
-      >
-        {children}
-      </SupabaseContext.Provider>
-    ),
-  };
-});
+  }),
+}));
 
 describe("Header", () => {
   it("renders the header component", () => {
