@@ -23,19 +23,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: ./.github/workflows/shared-setup-node.yml
         with:
           node-version-file: .nvmrc
-          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
+
+      # Install prettier explicitly to ensure it's available
+      - name: Install prettier
+        run: npm install --no-save prettier
 
       - name: Run linter
         run: npm run lint
 
       - name: Run formatter check
-        run: npm run format
+        run: npx prettier --check --ignore-path .gitignore .
 
       - name: Run unit tests
         run: npm run test
