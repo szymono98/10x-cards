@@ -136,11 +136,11 @@ jobs:
           echo "Inicjalizacja Tailwind CSS..."
           # Upewnij się, że globalne pliki CSS istnieją
           mkdir -p src/app
-          if [ ! -f "src/styles/globals.css" ]; then
-            echo "@tailwind base;\n@tailwind components;\n@tailwind utilities;" > src/styles/globals.css
+          if [ ! -f "src/app/globals.css" ]; then
+            echo "@tailwind base;\n@tailwind components;\n@tailwind utilities;" > src/app/globals.css
           fi
           # Wygeneruj plik CSS
-          npx tailwindcss -i ./src/styles/globals.css -o ./src/app/tailwind.css --minify
+          npx tailwindcss -i ./src/app/globals.css -o ./src/app/tailwind.css --minify
           echo "Tailwind CSS zainicjalizowany."
 
       - name: Verify tailwindcss installation

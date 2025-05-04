@@ -178,7 +178,7 @@ try {
 // Użyj npx do wygenerowania pliku CSS na podstawie Tailwind
 console.log('🔧 Generuję plik CSS za pomocą npx tailwindcss...');
 try {
-  execSync('npx tailwindcss -i ./src/styles/globals.css -o ./src/app/tailwind.css', {
+  execSync('npx tailwindcss -i ./src/app/globals.css -o ./src/app/tailwind.css', {
     stdio: 'inherit',
   });
   console.log('✅ Plik CSS wygenerowany pomyślnie');
