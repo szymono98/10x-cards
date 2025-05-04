@@ -109,14 +109,46 @@ jobs:
       - name: Install dependencies
         run: |
           npm install --no-fund --no-audit
-          
+
       - name: Run CI setup script
         run: node setup-ci.mjs
-          
+
+      # Dodatkowy krok, który sprawdza zawartość pliku package.json
+      - name: Check package.json content
+        run: |
+          echo "Package.json content:"
+          cat package.json
+          echo "------------"
+          echo "Checking dependencies:"
+          grep -A 20 "devDependencies" package.json
+
+      # Dodatkowy krok, który zainstaluje wymagane zależności bezpośrednio przed budowaniem
+      - name: Install critical dependencies
+        run: |
+          echo "Installing critical dependencies directly..."
+          npm install -D tailwindcss@3.3.3 postcss@8.4.27 autoprefixer@10.4.14
+          echo "Checking if installation succeeded:"
+          npm list tailwindcss postcss autoprefixer
+
+      # Dodatkowy krok, który bezpośrednio przygotuje tailwindcss przed budowaniem
+      - name: Prepare Tailwind CSS
+        run: |
+          echo "Inicjalizacja Tailwind CSS..."
+          # Upewnij się, że globalne pliki CSS istnieją
+          mkdir -p src/app
+          if [ ! -f "src/styles/globals.css" ]; then
+            echo "@tailwind base;\n@tailwind components;\n@tailwind utilities;" > src/styles/globals.css
+          fi
+          # Wygeneruj plik CSS
+          npx tailwindcss -i ./src/styles/globals.css -o ./src/app/tailwind.css --minify
+          echo "Tailwind CSS zainicjalizowany."
+
       - name: Verify tailwindcss installation
         run: |
           echo "Checking for tailwindcss module..."
           npm list tailwindcss
+          echo "Lokalne uruchomienie tailwindcss przez npx:"
+          npx tailwindcss --help
           echo "Content of PostCSS config:"
           cat postcss.config.mjs
           echo "Content of Tailwind config:"
