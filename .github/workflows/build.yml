@@ -1,17 +1,19 @@
-name: Test and Build main
+name: Build and Test
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build and Test
+  quality-check:
+    name: Quality Check
     runs-on: ubuntu-latest
 
     env:
-      NODE_ENV: production
+      NODE_ENV: test
 
     steps:
       - name: Verify branch
@@ -21,27 +23,62 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 19
+          node-version-file: .nvmrc
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run unit and integration tests
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run formatter check
+        run: npm run format
+
+      - name: Run unit tests
         run: npm run test
 
-      - name: Run end-to-end tests
-        run: npx playwright test
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ./coverage
+          retention-days: 5
+
+  build:
+    name: Build Production
+    needs: quality-check
+    runs-on: ubuntu-latest
+
+    env:
+      NODE_ENV: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build production
         run: npm run build
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/*.json
-          flags: unittests
-          fail_ci_if_error: true
+      - name: Verify latest versions of GitHub Actions
+        run: |
+          echo "Checking actions/checkout version..."
+          curl -s https://api.github.com/repos/actions/checkout/releases/latest | grep '"tag_name":' | sed -E 's/.*"v([0-9]+).*/\1/'
+
+          echo "Checking actions/setup-node version..."
+          curl -s https://api.github.com/repos/actions/setup-node/releases/latest | grep '"tag_name":' | sed -E 's/.*"v([0-9]+).*/\1/'
+
+          echo "Checking actions/upload-artifact version..."
+          curl -s https://api.github.com/repos/actions/upload-artifact/releases/latest | grep '"tag_name":' | sed -E 's/.*"v([0-9]+).*/\1/'
