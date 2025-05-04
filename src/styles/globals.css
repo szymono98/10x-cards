@@ -51,10 +51,13 @@
   }
 
   * {
-    border-color: theme('colors.border');
+    @apply border-border;
+    outline-color: hsl(var(--ring) / 0.5);
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply font-sans;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
