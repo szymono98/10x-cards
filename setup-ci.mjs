@@ -1,7 +1,9 @@
 // setup-ci.js
 // Ten skrypt zapewnia, że wszystkie niezbędne zależności są zainstalowane poprawnie w CI
-import * as fs from 'fs';
+import fs from 'fs';
 import { execSync } from 'child_process';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
 console.log('🔧 Konfiguracja środowiska CI dla 10x-cards...');
 

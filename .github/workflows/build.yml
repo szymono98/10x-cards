@@ -109,10 +109,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm install --no-fund --no-audit
-
+          
       - name: Run CI setup script
-        run: node setup-ci.js
-
+        run: node setup-ci.mjs
+          
       - name: Verify tailwindcss installation
         run: |
           echo "Checking for tailwindcss module..."
