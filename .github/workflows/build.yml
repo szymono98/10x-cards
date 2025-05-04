@@ -16,9 +16,6 @@ jobs:
       NODE_ENV: test
 
     steps:
-      - name: Verify branch
-        run: git branch -a | cat
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -29,9 +26,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm ci
-          npm install -D tailwindcss@3.3.3 postcss@8.4.27 autoprefixer@10.4.14
+        run: npm ci
+
+      - name: Setup Tailwind CSS
+        run: node setup-tailwind.mjs
 
       - name: Run linter
         run: npm run lint
@@ -92,23 +90,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm ci
-          # Explicite instalujemy wymagane wersje pakietów dla Tailwind CSS
-          npm install -D tailwindcss@3.3.3 postcss@8.4.27 autoprefixer@10.4.14
+        run: npm ci
 
-      - name: Verify Tailwind CSS installation
-        run: |
-          echo "Sprawdzam instalację Tailwind CSS:"
-          npm list tailwindcss
-          echo "Wyświetlam konfigurację:"
-          cat tailwind.config.ts
-          echo "Wyświetlam plik globals.css:"
-          cat src/app/globals.css
-          echo "Tworzymy podstawowy plik CSS dla Tailwind:"
-          echo "@tailwind base; @tailwind components; @tailwind utilities;" > tailwind-input.css
-          echo "Próba wygenerowania pliku CSS za pomocą Tailwind CLI:"
-          npx tailwindcss -i tailwind-input.css -o tailwind-output.css
+      - name: Setup Tailwind CSS
+        run: node setup-tailwind.mjs
 
       - name: Build production
         run: npm run build
