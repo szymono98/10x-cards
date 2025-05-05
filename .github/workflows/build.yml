@@ -97,9 +97,9 @@ jobs:
             key: ${{ runner.os }}-nextjs-\
             ${{ hashFiles('**/package-lock.json') }}-\
             ${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
-            restore-keys: |
-              ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-              ${{ runner.os }}-nextjs-
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-nextjs-
 
       - name: Install dependencies
         run: |
