@@ -8,10 +8,6 @@ const nextConfig: NextConfig = {
   },
   // Upewniamy się, że Next.js jest świadomy zewnętrznych zależności
   transpilePackages: [],
-  // Optymalizacja CSS
-  optimizeCss: true,
-  // Konfiguracja modułów CSS dla lepszej integracji z Tailwind
-  cssModules: true,
 };
 
 export default nextConfig;
