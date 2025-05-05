@@ -88,18 +88,18 @@ jobs:
           node-version-file: .nvmrc
           cache: 'npm'
 
-      # Cache Next.js build artifacts between runs
-      - name: Cache Next.js build
+      - name: Restore or cache npm & Next.js build
         uses: actions/cache@v4
         with:
-          # Cache the .next/cache folder
           path: |
+            ~/.npm
             ${{ github.workspace }}/.next/cache
-          # Use lockfile checksum as part of the key
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}
-          # Fallback to any previous Next.js cache
-          restore-keys: |
-            ${{ runner.os }}-nextjs-
+            key: ${{ runner.os }}-nextjs-\
+            ${{ hashFiles('**/package-lock.json') }}-\
+            ${{ hashFiles('**/*.{js,jsx,ts,tsx}') }}
+            restore-keys: |
+              ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+              ${{ runner.os }}-nextjs-
 
       - name: Install dependencies
         run: |
