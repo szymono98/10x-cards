@@ -27,8 +27,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
           npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+          npm ci
+          npm run build:css || true
 
       - name: Run linter
         run: npm run lint
@@ -90,8 +91,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci --include=dev
           npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
+          npm ci --include=dev
+          npm run build:css || true
 
       - name: Build production
         run: npm run build
