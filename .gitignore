@@ -22,3 +22,6 @@ build/
 .cache/
 *.cache
 .eslintcache
+
+# Generated CSS
+src/styles/output.css
