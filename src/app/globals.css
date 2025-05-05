@@ -75,12 +75,11 @@
     --sidebar-border: 217 19% 27%;
     --sidebar-ring: 224 76% 48%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground font-sans;
   }
@@ -90,9 +89,13 @@
   .btn-primary {
     @apply bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md;
   }
-  
+
   .card-shadow {
     @apply shadow-md hover:shadow-lg transition-shadow duration-200;
+  }
+
+  .form-input {
+    @apply w-full border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
 }
 

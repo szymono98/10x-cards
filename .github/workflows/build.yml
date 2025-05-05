@@ -26,10 +26,9 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Setup Tailwind CSS
-        run: node setup-tailwind.mjs
+        run: |
+          npm ci
+          npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
 
       - name: Run linter
         run: npm run lint
@@ -90,10 +89,9 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Setup Tailwind CSS
-        run: node setup-tailwind.mjs
+        run: |
+          npm ci
+          npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
 
       - name: Build production
         run: npm run build
