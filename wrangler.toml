@@ -1,2 +1,5 @@
-`[build]
+[build]
 command = "npm run generate:css && npm run build"
+
+[build.output]
+pages_build_output_dir = ".next"
