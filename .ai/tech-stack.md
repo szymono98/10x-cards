@@ -27,5 +27,5 @@ Narzędzia testowe w CI/CD:
 
 CI/CD i Hosting:
 -Github Actions
--DigitalOcean
+-Cloudflare Pages jako hosting aplikacji Next.JS
 <tech-stack>

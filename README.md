@@ -25,7 +25,7 @@
   - **E2E:** Playwright
   - **Visual Testing:** Percy/Chromatic (optional)
   - **Accessibility:** axe-core
-- **CI/CD & Hosting:** GitHub Actions, DigitalOcean
+- **CI/CD & Hosting:** GitHub Actions, Cloudflare Pages
 
 ## Getting Started Locally
 

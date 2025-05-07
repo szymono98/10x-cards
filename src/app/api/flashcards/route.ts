@@ -3,6 +3,8 @@ import { FlashcardsCreateCommand } from '@/types';
 import { validateFlashcardsCommand } from '././flashcards.validation';
 import { flashcardsService } from '././flashcards.service';
 
+export const runtime = 'edge';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
