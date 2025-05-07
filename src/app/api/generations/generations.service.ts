@@ -1,4 +1,3 @@
-import { createHash } from 'crypto';
 import { supabaseClient, DEFAULT_USER_ID } from '@/db/supabase.client';
 import {
   GenerateFlashcardsCommand,
@@ -7,6 +6,14 @@ import {
 } from '@/types';
 import { OpenRouterService } from '@/lib/openrouter.service';
 import { FlashcardLLMResponse } from '@/lib/openrouter.types';
+
+async function generateMD5Hash(message: string): Promise<string> {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('MD5', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+}
 
 class GenerationsService {
   private openRouter: OpenRouterService;
@@ -35,7 +42,7 @@ class GenerationsService {
   }
 
   async generate(command: GenerateFlashcardsCommand): Promise<GenerationCreateResponseDto> {
-    const sourceTextHash = createHash('md5').update(command.source_text).digest('hex');
+    const sourceTextHash = await generateMD5Hash(command.source_text);
     const startTime = Date.now();
 
     try {
