@@ -1,5 +1,8 @@
 [build]
-command = "npm run generate:css && npm run build"
+command = "npm run build"
+output_directory = ".next"
 
-[build.output]
-pages_build_output_dir = ".next"
+[build.environment]
+NODE_ENV = "production"
+NEXT_PUBLIC_SUPABASE_URL = "dummy"  # Will be overridden in Cloudflare dashboard
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "dummy"  # Will be overridden in Cloudflare dashboard

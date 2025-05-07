@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import '@/styles/output.css';
 import { AuthProvider } from '@/lib/supabase/context';
 import { SupabaseProvider } from '@/lib/providers/supabase-provider';
 
