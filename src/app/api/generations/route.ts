@@ -5,6 +5,22 @@ import { generationsService } from './generations.service';
 
 export const runtime = 'edge';
 
+export const GET = async () => {
+  return new NextResponse('Method not allowed', { status: 405 });
+};
+
+export const PUT = async () => {
+  return new NextResponse('Method not allowed', { status: 405 });
+};
+
+export const DELETE = async () => {
+  return new NextResponse('Method not allowed', { status: 405 });
+};
+
+export const PATCH = async () => {
+  return new NextResponse('Method not allowed', { status: 405 });
+};
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -20,6 +36,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     console.error('Error processing generation request:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error during generation' },
+      { status: 500 }
+    );
   }
 }
