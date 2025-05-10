@@ -1,8 +1,15 @@
 import { FlashcardsCreateCommand } from '../../src/types';
 import { validateFlashcardsCommand } from '../../src/app/api/flashcards/flashcards.validation';
-import { flashcardsService } from '../../src/app/api/flashcards/flashcards.service';
+import { createSupabaseClient } from '../../src/lib/supabase.functions';
 
-export async function onRequestPost({ request }: { request: Request }) {
+interface Env {
+  NEXT_PUBLIC_SUPABASE_URL: string;
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
+}
+
+export async function onRequestPost({ request, env }: { request: Request; env: Env }) {
+  const supabase = createSupabaseClient(env);
+
   try {
     const body = await request.json();
     const validation = validateFlashcardsCommand(body);
@@ -15,9 +22,14 @@ export async function onRequestPost({ request }: { request: Request }) {
     }
 
     const command = body as FlashcardsCreateCommand;
-    const result = await flashcardsService.create(command);
+    const { data, error } = await supabase
+      .from('flashcards')
+      .insert(command.flashcards)
+      .select();
 
-    return new Response(JSON.stringify({ flashcards: result }), {
+    if (error) throw error;
+
+    return new Response(JSON.stringify({ flashcards: data }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -33,10 +45,9 @@ export async function onRequestPost({ request }: { request: Request }) {
   }
 }
 
-// Handle other HTTP methods
-export async function onRequest({ request }: { request: Request }) {
+export async function onRequest({ request, env }: { request: Request; env: Env }) {
   if (request.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 });
   }
-  return onRequestPost({ request });
+  return onRequestPost({ request, env });
 }
