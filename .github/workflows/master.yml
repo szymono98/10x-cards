@@ -119,5 +119,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
-            pages deploy out --project-name=10x-cards
+            pages deploy out --project-name=10x-cards --commit-dirty=true
           wranglerVersion: '3'

@@ -11,8 +11,9 @@ const nextConfig: NextConfig = {
   webpack: (config) => {
     return config;
   },
-  // Handle external dependencies
-  transpilePackages: [],
+  // Skip build-time API route generation
+  skipTrailingSlashRedirect: true,
+  skipApiResolution: true,
 };
 
 export default nextConfig;
