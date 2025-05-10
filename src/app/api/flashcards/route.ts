@@ -1,9 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FlashcardsCreateCommand } from '@/types';
-import { validateFlashcardsCommand } from '././flashcards.validation';
-import { flashcardsService } from '././flashcards.service';
+import { validateFlashcardsCommand } from './flashcards.validation';
+import { flashcardsService } from './flashcards.service';
 
+export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
+
+export const GET = async () => {
+  return new NextResponse('Method not allowed', { status: 405 });
+};
+
+export const PUT = async () => {
+  return new NextResponse('Method not allowed', { status: 405 });
+};
+
+export const DELETE = async () => {
+  return new NextResponse('Method not allowed', { status: 405 });
+};
+
+export const PATCH = async () => {
+  return new NextResponse('Method not allowed', { status: 405 });
+};
 
 export async function POST(request: NextRequest) {
   try {

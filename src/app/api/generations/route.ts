@@ -3,8 +3,11 @@ import { GenerateFlashcardsCommand } from '@/types';
 import { validateGenerateCommand } from './generations.validation';
 import { generationsService } from './generations.service';
 
+// Configure route for static generation
+export const dynamic = 'force-dynamic';
 export const runtime = 'edge';
 
+// Define allowed HTTP methods
 export const GET = async () => {
   return new NextResponse('Method not allowed', { status: 405 });
 };
