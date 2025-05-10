@@ -65,10 +65,11 @@ export class OpenRouterService {
 
   private async executeRequest(endpoint: string, payload: unknown): Promise<Response> {
     try {
+      const isDevelopment = process.env.NODE_ENV === 'development';
       const headers = {
         'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://10x-cards.pages.dev',
+        'HTTP-Referer': isDevelopment ? 'http://localhost:3000' : 'https://10x-cards.pages.dev',
         'HTTP-Referer-Path': '/generate',
         'X-Title': '10x-cards'
       };
@@ -78,7 +79,8 @@ export class OpenRouterService {
         headers: Object.keys(headers),
         payloadSize: JSON.stringify(payload).length,
         apiKeyPresent: !!this.apiKey,
-        apiKeyFormat: this.apiKey ? `${this.apiKey.slice(0, 10)}...` : 'not set'
+        apiKeyFormat: this.apiKey ? `${this.apiKey.slice(0, 10)}...` : 'not set',
+        environment: process.env.NODE_ENV
       });
 
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
