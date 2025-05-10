@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import type { FlashcardsCreateCommand, FlashcardDto } from '@/types';
 
+const API_ENDPOINT = process.env.NODE_ENV === 'production' 
+  ? '/functions/api/flashcards'
+  : '/api/flashcards';
+
 export function useSaveFlashcards() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -10,7 +14,7 @@ export function useSaveFlashcards() {
     setError(null);
 
     try {
-      const response = await fetch('/api/flashcards', {
+      const response = await fetch(API_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

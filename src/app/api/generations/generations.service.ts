@@ -6,13 +6,10 @@ import {
 } from '@/types';
 import { OpenRouterService } from '@/lib/openrouter.service';
 import { FlashcardLLMResponse } from '@/lib/openrouter.types';
+import MD5 from 'crypto-js/md5';
 
-async function generateMD5Hash(message: string): Promise<string> {
-  const msgBuffer = new TextEncoder().encode(message);
-  const hashBuffer = await crypto.subtle.digest('MD5', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
+function generateMD5Hash(message: string): string {
+  return MD5(message).toString();
 }
 
 class GenerationsService {
@@ -20,8 +17,8 @@ class GenerationsService {
 
   constructor() {
     const apiKey = process.env.OPENROUTER_API_KEY;
-    if (!apiKey) {
-      throw new Error('OPENROUTER_API_KEY is not set in environment variables');
+    if (!apiKey || apiKey.startsWith('sk-or-v1-xxxxx')) {
+      throw new Error('Valid OPENROUTER_API_KEY is not set in environment variables');
     }
 
     this.openRouter = OpenRouterService.getInstance({
@@ -42,7 +39,7 @@ class GenerationsService {
   }
 
   async generate(command: GenerateFlashcardsCommand): Promise<GenerationCreateResponseDto> {
-    const sourceTextHash = await generateMD5Hash(command.source_text);
+    const sourceTextHash = generateMD5Hash(command.source_text);
     const startTime = Date.now();
 
     try {
@@ -115,8 +112,9 @@ class GenerationsService {
         if (!parsedContent.flashcards) {
           throw new Error('Unexpected response format from AI model');
         }
-      } catch (error) {
-        throw error instanceof Error;
+      } catch (parseError) {
+        console.error('Failed to parse AI response:', content);
+        throw new Error('Failed to parse AI response: ' + (parseError instanceof Error ? parseError.message : String(parseError)));
       }
 
       const proposals: FlashcardProposalDto[] = parsedContent.flashcards.map((card) => ({
@@ -127,7 +125,7 @@ class GenerationsService {
 
       const generationDuration = Date.now() - startTime;
 
-      await supabaseClient
+      const { error: updateError } = await supabaseClient
         .from('generations')
         .update({
           generated_count: proposals.length,
@@ -135,14 +133,22 @@ class GenerationsService {
         })
         .eq('id', generation.id);
 
+      if (updateError) {
+        console.error('Failed to update generation record:', updateError);
+        // Continue despite update error, as we still want to return the generated flashcards
+      }
+
       return {
         generation_id: generation.id,
         flashcards_proposals: proposals,
         generated_count: proposals.length,
       };
     } catch (error) {
-      console.error('Error content: ', error);
-      throw error;
+      console.error('Generation error:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Unknown error during generation');
     }
   }
 }

@@ -1,19 +1,27 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // Cloudflare Pages configuration
-  output: 'export', // Changed from 'standalone' to 'export' for static site generation
-  images: {
-    unoptimized: true, // Required for Cloudflare Pages
-    domains: ['example.supabase.co'], // Add your Supabase domain
-  },
+  // Production configuration for Cloudflare Pages
+  ...(process.env.NODE_ENV === 'production'
+    ? {
+        output: 'export',
+        images: {
+          unoptimized: true,
+          domains: ['example.supabase.co'],
+        },
+        skipTrailingSlashRedirect: true,
+        skipApiResolution: true,
+      }
+    : {
+        // Development configuration
+        images: {
+          domains: ['example.supabase.co'],
+        },
+      }),
   // Ensure webpack can handle Tailwind modules
   webpack: (config) => {
     return config;
   },
-  // Skip build-time API route generation
-  skipTrailingSlashRedirect: true,
-  skipApiResolution: true,
 };
 
 export default nextConfig;

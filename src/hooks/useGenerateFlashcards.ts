@@ -1,6 +1,10 @@
 import { useState, useCallback } from 'react';
 import type { GenerateFlashcardsCommand, GenerationCreateResponseDto } from '@/types';
 
+const API_ENDPOINT = process.env.NODE_ENV === 'production' 
+  ? '/functions/api/generations'
+  : '/api/generations';
+
 export function useGenerateFlashcards() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -11,7 +15,7 @@ export function useGenerateFlashcards() {
       setError(null);
 
       try {
-        const response = await fetch('/api/generations', {
+        const response = await fetch(API_ENDPOINT, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

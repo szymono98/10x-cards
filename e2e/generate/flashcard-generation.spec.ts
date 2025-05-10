@@ -4,7 +4,7 @@ import { FlashcardGenerationPage } from '../page-objects/generate/FlashcardGener
 test.describe('Flashcard Generation', () => {
   test.beforeEach(async ({ page }) => {
     // Mock the generations endpoint
-    await page.route('/api/generations', async (route) => {
+    await page.route('/functions/api/generations', async (route) => {
       const request = route.request();
       if (request.method() === 'POST') {
         const body = JSON.parse((await request.postData()) || '{}');
@@ -40,6 +40,30 @@ test.describe('Flashcard Generation', () => {
               },
             ],
             generated_count: 2,
+          }),
+        });
+      }
+    });
+
+    // Mock the flashcards endpoint
+    await page.route('/functions/api/flashcards', async (route) => {
+      const request = route.request();
+      if (request.method() === 'POST') {
+        await route.fulfill({
+          status: 201,
+          body: JSON.stringify({
+            flashcards: [
+              {
+                id: 1,
+                front: 'What is the main purpose of the text?',
+                back: 'The text demonstrates character length validation.',
+                source: 'ai-full',
+                generation_id: 1,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                user_id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a'
+              }
+            ]
           }),
         });
       }
@@ -106,10 +130,9 @@ test.describe('Flashcard Generation', () => {
   test('should handle server errors gracefully', async ({ page }) => {
     // Arrange
     const flashcardPage = new FlashcardGenerationPage(page);
-    await page.goto('/generate');
 
     // Override the mock for this specific test
-    await page.route('/api/generations', async (route) => {
+    await page.route('/functions/api/generations', async (route) => {
       await route.fulfill({
         status: 500,
         body: JSON.stringify({ error: 'Server error during generation' }),

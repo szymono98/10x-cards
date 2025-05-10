@@ -22,22 +22,26 @@ const mockFlashcards = [
 // Define your API mocking handlers
 export const handlers = [
   // GET flashcards
-  http.get('/api/flashcards', () => {
+  http.get('/functions/api/flashcards', () => {
     return HttpResponse.json(mockFlashcards);
   }),
 
   // POST flashcards
-  http.post('/api/flashcards', async ({ request }) => {
+  http.post('/functions/api/flashcards', async ({ request }) => {
     const newFlashcard = (await request.json()) as FlashcardsCreateCommand;
     return HttpResponse.json({
-      ...newFlashcard,
-      id: `mock-${Date.now()}`,
-      createdAt: new Date().toISOString(),
+      flashcards: newFlashcard.flashcards.map(card => ({
+        ...card,
+        id: `mock-${Date.now()}`,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        user_id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a'
+      }))
     });
   }),
 
   // Mock your AI generation endpoint
-  http.post('/api/generations', async () => {
+  http.post('/functions/api/generations', async () => {
     return HttpResponse.json({
       generation_id: 123,
       flashcards_proposals: [

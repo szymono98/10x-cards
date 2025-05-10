@@ -22,7 +22,7 @@ export function validateFlashcardsCommand(body: unknown): {
   return { success: true };
 }
 
-function validateFlashcard(flashcard: FlashcardCreateDto): string | null {
+export function validateFlashcard(flashcard: FlashcardCreateDto): string | null {
   if (!flashcard.front || typeof flashcard.front !== 'string') {
     return 'front is required and must be a string';
   }
