@@ -1,12 +1,17 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  // Upewniamy się, że webpack może prawidłowo obsłużyć moduły Tailwind
+  // Cloudflare Pages configuration
+  output: 'standalone',
+  images: {
+    unoptimized: true, // Required for Cloudflare Pages
+    domains: ['example.supabase.co'], // Add your Supabase domain
+  },
+  // Ensure webpack can handle Tailwind modules
   webpack: (config) => {
     return config;
   },
-  // Upewniamy się, że Next.js jest świadomy zewnętrznych zależności
+  // Handle external dependencies
   transpilePackages: [],
 };
 
