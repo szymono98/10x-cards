@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { flashcardsService } from './flashcards.service';
-import { z } from 'zod';
-
-const createFlashcardSchema = z.object({
-  question: z.string().min(1),
-  answer: z.string().min(1),
-});
-
-export const validateCreateCommand = (data: unknown) => {
-  return createFlashcardSchema.safeParse(data);
-};
+import { validateFlashcardsCommand } from './flashcards.validation';
 
 // Configure route for static generation
 export const dynamic = 'force-dynamic';
@@ -36,9 +27,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const validation = validateCreateCommand(body);
+    const validation = validateFlashcardsCommand(body);
     if (!validation.success) {
-      return NextResponse.json({ error: validation.error }, { status: 400 });
+      return NextResponse.json({ error: validation.error.format() }, { status: 400 });
     }
 
     const flashcards = await flashcardsService.create(body);

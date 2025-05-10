@@ -1,47 +1,26 @@
-import { FlashcardsCreateCommand, FlashcardCreateDto } from '@/types';
+import { z } from 'zod';
+import { FlashcardCreateDto } from '@/types';
 
-export function validateFlashcardsCommand(body: unknown): {
-  success: boolean;
-  error?: string;
-} {
-  if (!body || typeof body !== 'object') {
-    return { success: false, error: 'Invalid request body' };
-  }
+export const flashcardSchema = z.object({
+  front: z.string().min(1).max(200),
+  back: z.string().min(1).max(500),
+  source: z.enum(['ai-full', 'ai-edited', 'manual']),
+  generation_id: z.number().optional()
+});
 
-  const { flashcards } = body as Partial<FlashcardsCreateCommand>;
+export const createFlashcardsSchema = z.object({
+  flashcards: z.array(flashcardSchema).min(1)
+});
 
-  if (!Array.isArray(flashcards) || flashcards.length === 0) {
-    return { success: false, error: 'flashcards must be a non-empty array' };
-  }
-
-  for (const flashcard of flashcards) {
-    const error = validateFlashcard(flashcard);
-    if (error) return { success: false, error };
-  }
-
-  return { success: true };
+export function validateFlashcardsCommand(body: unknown) {
+  return createFlashcardsSchema.safeParse(body);
 }
 
+// Keep the existing validation function for backward compatibility if needed
 export function validateFlashcard(flashcard: FlashcardCreateDto): string | null {
-  if (!flashcard.front || typeof flashcard.front !== 'string') {
-    return 'front is required and must be a string';
+  const result = flashcardSchema.safeParse(flashcard);
+  if (!result.success) {
+    return result.error.errors[0]?.message || 'Invalid flashcard data';
   }
-
-  if (!flashcard.back || typeof flashcard.back !== 'string') {
-    return 'back is required and must be a string';
-  }
-
-  if (!flashcard.source || !['ai-full', 'ai-edited', 'manual'].includes(flashcard.source)) {
-    return 'source must be one of: ai-full, ai-edited, manual';
-  }
-
-  if (flashcard.front.length > 200) {
-    return 'front must not exceed 200 characters';
-  }
-
-  if (flashcard.back.length > 500) {
-    return 'back must not exceed 500 characters';
-  }
-
   return null;
 }

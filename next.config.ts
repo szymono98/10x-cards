@@ -4,13 +4,11 @@ const nextConfig: NextConfig = {
   // Production configuration for Cloudflare Pages
   ...(process.env.NODE_ENV === 'production'
     ? {
-        output: 'export',
         images: {
           unoptimized: true,
           domains: ['example.supabase.co'],
         },
         skipTrailingSlashRedirect: true,
-        skipApiResolution: true,
       }
     : {
         // Development configuration
