@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // Cloudflare Pages configuration
-  output: 'standalone',
+  output: 'export', // Changed from 'standalone' to 'export' for static site generation
   images: {
     unoptimized: true, // Required for Cloudflare Pages
     domains: ['example.supabase.co'], // Add your Supabase domain

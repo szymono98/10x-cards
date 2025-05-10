@@ -84,17 +84,16 @@ jobs:
 
     env:
       NODE_ENV: production
-      # Required for Next.js build and Supabase client
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      # Required for OpenRouter AI integration
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-      # Disable telemetry during build
       NEXT_TELEMETRY_DISABLED: 1
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -106,6 +105,7 @@ jobs:
         run: |
           npm install -D tailwindcss postcss autoprefixer
           npm ci --include=dev
+          npm install -g wrangler@3
 
       - name: Generate CSS
         run: npx tailwindcss -i ./src/app/globals.css -o ./src/styles/output.css
@@ -119,5 +119,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: |
-            pages deploy .next/standalone --project-name=10x-cards
+            pages deploy out --project-name=10x-cards
           wranglerVersion: '3'
