@@ -1,6 +1,8 @@
 name: Deploy to Cloudflare Pages
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -118,10 +120,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: |
-            pages deployment create --project-name=10x-cards \
-              --env NEXT_PUBLIC_SUPABASE_URL="${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" \
-              --env NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
-              --env OPENROUTER_API_KEY="${{ secrets.OPENROUTER_API_KEY }}" \
-              --commit-dirty=true ./out
+          command: pages deploy out --project-name=10x-cards --commit-dirty=true
           wranglerVersion: '3'
