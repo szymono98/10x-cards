@@ -68,9 +68,9 @@ export class OpenRouterService {
       const headers = {
         'Authorization': `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://github.com/ostrzolekpawel/10x-cards',
-        'X-Title': '10x-cards',
-        'OpenAI-Organization': 'ostrzolekpawel-10x-cards'
+        'HTTP-Referer': 'https://10x-cards.pages.dev',
+        'HTTP-Referer-Path': '/generate',
+        'X-Title': '10x-cards'
       };
 
       console.log('Making OpenRouter request:', {
