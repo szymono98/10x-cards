@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generationsService } from './generations.service';
 import { validateGenerateCommand } from './generations.validation';
 
-export const runtime = 'edge';
-
-// Configure route for static generation
-export const dynamic = 'force-dynamic';
+// Configure route for standard Node.js runtime
+export const runtime = 'nodejs';
 
 // Define allowed HTTP methods
 export const GET = async () => {

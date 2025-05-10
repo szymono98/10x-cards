@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
 
-export default function Home() {
-  redirect('/generate');
+export const runtime = 'edge';
+
+export default async function Home() {
+  return redirect('/generate');
 }

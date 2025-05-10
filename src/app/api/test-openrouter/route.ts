@@ -1,6 +1,8 @@
 import { OpenRouterService } from '@/lib/openrouter.service';
 import { NextResponse } from 'next/server';
 
+export const runtime = 'nodejs';
+
 export async function GET() {
   try {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -35,6 +37,7 @@ export async function GET() {
   } catch (error) {
     console.error('OpenRouter test failed:', error);
     return NextResponse.json({ 
+      status: 'error',
       error: error instanceof Error ? error.message : 'Unknown error',
       details: error
     }, { status: 500 });

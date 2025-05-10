@@ -9,29 +9,37 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // Ścieżki wymagające autoryzacji
+  // Protected paths
   const protectedPaths = ['/sets', '/profile'];
   const isProtectedPath = protectedPaths.some((path) => req.nextUrl.pathname.startsWith(path));
 
-  // Przekierowanie z chronionych ścieżek na login
+  // Redirect from protected paths to login
   if (isProtectedPath && !session) {
-    return NextResponse.redirect(new URL('/auth/login', req.url));
+    const redirectUrl = new URL('/auth/login', req.url);
+    return NextResponse.redirect(redirectUrl);
   }
 
-  // Przekierowanie TYLKO z /auth/login (nie z register ani reset-password)
-  // i tylko jeśli użytkownik jest zalogowany i nie ma flagi rejestracji
+  // Handle /auth/login redirect only when user is logged in
   if (req.nextUrl.pathname === '/auth/login' && session) {
     const { user } = session;
     const isRegistering = user.user_metadata?.registration === true;
 
     if (!isRegistering) {
-      return NextResponse.redirect(new URL('/generate', req.url));
+      const redirectUrl = new URL('/generate', req.url);
+      return NextResponse.redirect(redirectUrl);
     }
   }
 
   return res;
 }
 
+// Update matcher to be more specific and Cloudflare-compatible
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    '/',
+    '/generate',
+    '/sets/:path*',
+    '/profile/:path*',
+    '/auth/:path*'
+  ]
 };

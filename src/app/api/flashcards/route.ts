@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { flashcardsService } from './flashcards.service';
 import { validateFlashcardsCommand } from './flashcards.validation';
 
-// Configure route for static generation
-export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
+// Configure route for standard Node.js runtime
+export const runtime = 'nodejs';
 
 // Define allowed HTTP methods
 export const GET = async () => {
