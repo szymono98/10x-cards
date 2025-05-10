@@ -7,6 +7,7 @@ jobs:
   lint:
     name: Lint Code
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,9 +49,12 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: lint
+    environment: production
     env:
       NODE_ENV: test
-
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -73,12 +77,21 @@ jobs:
     name: Deploy to Cloudflare Pages
     needs: [lint, test]
     runs-on: ubuntu-latest
+    environment: production
     permissions:
       contents: read
       deployments: write
-    environment:
-      name: production
-      url: https://10x-cards.pages.dev
+
+    env:
+      NODE_ENV: production
+      # Required for Next.js build and Supabase client
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      # Required for OpenRouter AI integration
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      # Disable telemetry during build
+      NEXT_TELEMETRY_DISABLED: 1
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
