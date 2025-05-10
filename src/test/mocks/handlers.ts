@@ -19,14 +19,47 @@ const mockFlashcards = [
   },
 ];
 
+// Mock response for generations
+const mockGenerationResponse: GenerationCreateResponseDto = {
+  generation_id: 123,
+  flashcards_proposals: [
+    {
+      front: 'What is TypeScript?',
+      back: 'A strongly typed programming language that builds on JavaScript',
+      source: 'ai-full',
+    },
+    {
+      front: 'What is TailwindCSS?',
+      back: 'A utility-first CSS framework',
+      source: 'ai-full',
+    },
+  ],
+  generated_count: 2,
+};
+
 // Define your API mocking handlers
 export const handlers = [
-  // GET flashcards
+  // GET flashcards - both paths
+  http.get('/api/flashcards', () => {
+    return HttpResponse.json(mockFlashcards);
+  }),
   http.get('/functions/api/flashcards', () => {
     return HttpResponse.json(mockFlashcards);
   }),
 
-  // POST flashcards
+  // POST flashcards - both paths
+  http.post('/api/flashcards', async ({ request }) => {
+    const newFlashcard = (await request.json()) as FlashcardsCreateCommand;
+    return HttpResponse.json({
+      flashcards: newFlashcard.flashcards.map(card => ({
+        ...card,
+        id: `mock-${Date.now()}`,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        user_id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a'
+      }))
+    });
+  }),
   http.post('/functions/api/flashcards', async ({ request }) => {
     const newFlashcard = (await request.json()) as FlashcardsCreateCommand;
     return HttpResponse.json({
@@ -40,23 +73,11 @@ export const handlers = [
     });
   }),
 
-  // Mock your AI generation endpoint
+  // Generations - both paths
+  http.post('/api/generations', async () => {
+    return HttpResponse.json(mockGenerationResponse);
+  }),
   http.post('/functions/api/generations', async () => {
-    return HttpResponse.json({
-      generation_id: 123,
-      flashcards_proposals: [
-        {
-          front: 'What is TypeScript?',
-          back: 'A strongly typed programming language that builds on JavaScript',
-          source: 'ai-full',
-        },
-        {
-          front: 'What is TailwindCSS?',
-          back: 'A utility-first CSS framework',
-          source: 'ai-full',
-        },
-      ],
-      generated_count: 2,
-    } as GenerationCreateResponseDto);
+    return HttpResponse.json(mockGenerationResponse);
   }),
 ];

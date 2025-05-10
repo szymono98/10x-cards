@@ -17,7 +17,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "dev:e2e": "NODE_ENV=test next dev",
+    "dev:e2e": "cp .env.test .env.local && NODE_ENV=test next dev",
     "generate:css": "mkdir -p src/styles && npx tailwindcss -i ./src/app/globals.css -o ./src/styles/output.css"
   },
   "dependencies": {

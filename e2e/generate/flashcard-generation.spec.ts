@@ -4,7 +4,7 @@ import { FlashcardGenerationPage } from '../page-objects/generate/FlashcardGener
 test.describe('Flashcard Generation', () => {
   test.beforeEach(async ({ page }) => {
     // Mock the generations endpoint
-    await page.route('/functions/api/generations', async (route) => {
+    await page.route('/api/generations', async (route) => {
       const request = route.request();
       if (request.method() === 'POST') {
         const body = JSON.parse((await request.postData()) || '{}');
@@ -46,7 +46,7 @@ test.describe('Flashcard Generation', () => {
     });
 
     // Mock the flashcards endpoint
-    await page.route('/functions/api/flashcards', async (route) => {
+    await page.route('/api/flashcards', async (route) => {
       const request = route.request();
       if (request.method() === 'POST') {
         await route.fulfill({
@@ -76,9 +76,6 @@ test.describe('Flashcard Generation', () => {
     // Arrange
     const flashcardPage = new FlashcardGenerationPage(page);
     const sampleText = 'a'.repeat(1500); // Zapewniamy tekst o długości powyżej 1000 znaków
-
-    // Act
-    await page.goto('/generate');
 
     // Generowanie fiszek
     await flashcardPage.generateFlashcards(sampleText);
@@ -132,7 +129,7 @@ test.describe('Flashcard Generation', () => {
     const flashcardPage = new FlashcardGenerationPage(page);
 
     // Override the mock for this specific test
-    await page.route('/functions/api/generations', async (route) => {
+    await page.route('/api/generations', async (route) => {
       await route.fulfill({
         status: 500,
         body: JSON.stringify({ error: 'Server error during generation' }),
