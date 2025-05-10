@@ -90,7 +90,6 @@ jobs:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       NEXT_TELEMETRY_DISABLED: 1
-      CLOUDFLARE_PAGES: true
 
     steps:
       - name: Checkout code
@@ -121,5 +120,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy out --project-name=10x-cards --commit-dirty=true
+          command: pages deploy .next --project-name=10x-cards --commit-dirty=true
           wranglerVersion: '3'

@@ -1,10 +1,6 @@
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
-# Build output configuration
-[pages]
-pages_build_output_dir = "out"
-
 # Secrets that should be set in Cloudflare Dashboard:
 # - NEXT_PUBLIC_SUPABASE_URL
 # - NEXT_PUBLIC_SUPABASE_ANON_KEY

@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generationsService } from './generations.service';
 import { validateGenerateCommand } from './generations.validation';
 
+export const runtime = 'edge';
+
 // Configure route for static generation
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
 
 // Define allowed HTTP methods
 export const GET = async () => {
