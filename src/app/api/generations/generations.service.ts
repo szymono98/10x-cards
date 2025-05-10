@@ -16,7 +16,7 @@ class GenerationsService {
   private openRouter: OpenRouterService;
 
   constructor() {
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY;    
     if (!apiKey || apiKey.startsWith('sk-or-v1-xxxxx')) {
       throw new Error('Valid OPENROUTER_API_KEY is not set in environment variables');
     }
