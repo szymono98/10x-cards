@@ -105,8 +105,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
           npm install -D tailwindcss postcss autoprefixer
+          npm ci --include=dev
 
       - name: Generate CSS
         run: npx tailwindcss -i ./src/app/globals.css -o ./src/styles/output.css
