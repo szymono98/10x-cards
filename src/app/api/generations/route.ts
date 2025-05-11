@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generationsService } from './generations.service';
 import { validateGenerateCommand } from './generations.validation';
 
-// Configure route for standard Node.js runtime
-export const runtime = 'nodejs';
+// Configure route for Edge Runtime with Cloudflare
+export const runtime = 'edge';
+export const preferredRegion = 'auto';
 
 // Define allowed HTTP methods
 export const GET = async () => {

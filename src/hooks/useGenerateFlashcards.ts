@@ -1,9 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { GenerateFlashcardsCommand, GenerationCreateResponseDto } from '@/types';
 
-const API_ENDPOINT = process.env.NODE_ENV === 'production' 
-  ? '/functions/api/generations'
-  : '/api/generations';
+const API_ENDPOINT = '/api/generations';
 
 export function useGenerateFlashcards() {
   const [isLoading, setIsLoading] = useState(false);

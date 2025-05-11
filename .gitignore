@@ -17,6 +17,7 @@ next-env.d.ts
 # Build
 dist/
 build/
+.vercel/
 
 # Cache
 .cache/

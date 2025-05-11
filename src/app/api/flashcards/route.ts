@@ -3,7 +3,7 @@ import { flashcardsService } from './flashcards.service';
 import { validateFlashcardsCommand } from './flashcards.validation';
 
 // Configure route for standard Node.js runtime
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
 // Define allowed HTTP methods
 export const GET = async () => {

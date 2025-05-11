@@ -1,7 +1,7 @@
 import { OpenRouterService } from '@/lib/openrouter.service';
 import { NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
 export async function GET() {
   try {

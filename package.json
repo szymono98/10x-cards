@@ -18,7 +18,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
     "dev:e2e": "cp .env.test .env.local && NODE_ENV=test next dev",
-    "generate:css": "mkdir -p src/styles && npx tailwindcss -i ./src/app/globals.css -o ./src/styles/output.css"
+    "generate:css": "mkdir -p src/styles && npx tailwindcss -i ./src/app/globals.css -o ./src/styles/output.css",
+    "pages:build": "npx @cloudflare/next-on-pages"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.4",
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.1",
+    "@cloudflare/next-on-pages": "^0.0.0-3d84ab0",
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.52.0",
     "@testing-library/jest-dom": "^6.6.3",
