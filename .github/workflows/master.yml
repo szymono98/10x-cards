@@ -105,9 +105,8 @@ jobs:
 
       - name: Install dependencies
         run: |
+          npm ci
           npm install -D tailwindcss postcss autoprefixer
-          npm ci --include=dev
-          npm install -g wrangler@3
 
       - name: Generate CSS
         run: npx tailwindcss -i ./src/app/globals.css -o ./src/styles/output.css
@@ -120,5 +119,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .next --project-name=10x-cards --commit-dirty=true
-          wranglerVersion: '3'
+          command: pages deploy .next --project-name=10x-cards --commit-dirty=true --branch=main
