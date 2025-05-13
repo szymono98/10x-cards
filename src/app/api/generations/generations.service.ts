@@ -44,7 +44,12 @@ class GenerationsService {
 
     try {
       console.log('Attempting to insert generation record...');
-      const { data: { session } } = await supabaseClient.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+      }
+      
       const userId = session?.user?.id || ANONYMOUS_USER_ID;
 
       const { data: generation, error } = await supabaseClient
@@ -69,7 +74,7 @@ class GenerationsService {
           details: error.details,
           hint: error.hint
         });
-        throw new Error(`Database error: code: ${error.code}`);
+        throw new Error(`Database error: ${error.message || error.code || 'Unknown error'}`);
       }
       if (!generation) throw new Error('No generation record returned after insert');
 
