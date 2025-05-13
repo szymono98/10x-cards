@@ -16,7 +16,7 @@ class GenerationsService {
   private openRouter: OpenRouterService;
 
   constructor() {
-    const apiKey = process.env.OPENROUTER_API_KEY;    
+    const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey || apiKey.startsWith('sk-or-v1-xxxxx')) {
       throw new Error('Valid OPENROUTER_API_KEY is not set in environment variables');
     }
@@ -43,16 +43,10 @@ class GenerationsService {
     const startTime = Date.now();
 
     try {
-      console.log('Attempting to insert generation record...');
-      
-      // Always use anonymous user ID in Edge runtime for consistency
-      const userId = ANONYMOUS_USER_ID;
-      console.log('Using user ID:', userId);
-
       const { data: generation, error } = await supabaseClient
         .from('generations')
         .insert({
-          user_id: userId,
+          user_id: ANONYMOUS_USER_ID,
           source_text_hash: sourceTextHash,
           source_text_length: command.source_text.length,
           model: 'openai/gpt-4o-mini',
@@ -64,15 +58,7 @@ class GenerationsService {
         .select('*')
         .single();
 
-      if (error) {
-        console.error('Supabase insert error:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
-        throw new Error(`Database error: ${error.message || error.code || 'Unknown error'}`);
-      }
+      if (error) throw new Error(`Database error: ${error.message}`);
       if (!generation) throw new Error('No generation record returned after insert');
 
       const response = await this.openRouter.chatCompletion({
@@ -159,7 +145,10 @@ class GenerationsService {
       };
     } catch (error) {
       console.error('Generation error:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Unknown error during generation');
     }
   }
 }
