@@ -44,13 +44,10 @@ class GenerationsService {
 
     try {
       console.log('Attempting to insert generation record...');
-      const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
       
-      if (sessionError) {
-        console.error('Session error:', sessionError);
-      }
-      
-      const userId = session?.user?.id || ANONYMOUS_USER_ID;
+      // Always use anonymous user ID in Edge runtime for consistency
+      const userId = ANONYMOUS_USER_ID;
+      console.log('Using user ID:', userId);
 
       const { data: generation, error } = await supabaseClient
         .from('generations')
@@ -162,10 +159,7 @@ class GenerationsService {
       };
     } catch (error) {
       console.error('Generation error:', error);
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Unknown error during generation');
+      throw error;
     }
   }
 }
