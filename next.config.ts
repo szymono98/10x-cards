@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
         skipTrailingSlashRedirect: true,
         poweredByHeader: false,
         compress: true,
+        output: 'standalone', // Optimize output for Cloudflare Pages
       }
     : {
         // Development configuration
@@ -21,6 +22,7 @@ const nextConfig: NextConfig = {
   
   experimental: {
     optimizeCss: true,
+    optimizePackageImports: ['lucide-react'], // Optimize package imports
   },
 
   // Cloudflare Pages specific configuration
@@ -38,6 +40,17 @@ const nextConfig: NextConfig = {
         "os": false,
       }
     }
+
+    // Optimize chunk size
+    if (config.optimization && !isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        minSize: 20000,
+        maxSize: 24576, // Keep chunks under Cloudflare's 25MB limit
+        minChunks: 1,
+      };
+    }
+
     return config;
   },
 

@@ -112,11 +112,13 @@ jobs:
         run: npx tailwindcss -i ./src/app/globals.css -o ./src/styles/output.css
 
       - name: Build production
-        run: npm run build
+        run: |
+          npm run build
+          npm run pages:build
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .next --project-name=10x-cards --commit-dirty=true --branch=main
+          command: pages deploy .vercel/output/static --project-name=10x-cards --commit-dirty=true --branch=main
