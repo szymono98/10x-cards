@@ -1,4 +1,4 @@
-import { supabaseClient, DEFAULT_USER_ID } from '@/db/supabase.client';
+import { supabaseClient, ANONYMOUS_USER_ID } from '@/db/supabase.client';
 import {
   GenerateFlashcardsCommand,
   GenerationCreateResponseDto,
@@ -43,10 +43,14 @@ class GenerationsService {
     const startTime = Date.now();
 
     try {
+      console.log('Attempting to insert generation record...');
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const userId = session?.user?.id || ANONYMOUS_USER_ID;
+
       const { data: generation, error } = await supabaseClient
         .from('generations')
         .insert({
-          user_id: DEFAULT_USER_ID,
+          user_id: userId,
           source_text_hash: sourceTextHash,
           source_text_length: command.source_text.length,
           model: 'openai/gpt-4o-mini',
@@ -58,7 +62,15 @@ class GenerationsService {
         .select('*')
         .single();
 
-      if (error) throw new Error(`Database error: ${error.message}`);
+      if (error) {
+        console.error('Supabase insert error:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        throw new Error(`Database error: code: ${error.code}`);
+      }
       if (!generation) throw new Error('No generation record returned after insert');
 
       const response = await this.openRouter.chatCompletion({

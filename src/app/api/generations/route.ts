@@ -4,7 +4,7 @@ import { validateGenerateCommand } from './generations.validation';
 
 // Configure route for Edge Runtime with Cloudflare
 export const runtime = 'edge';
-export const preferredRegion = 'auto';
+export const preferredRegion = 'fra1'; // Frankfurt - usually good for European users
 
 // Define allowed HTTP methods
 export const GET = async () => {

@@ -6,4 +6,5 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabaseClient = createClient<Database>(supabaseUrl, supabaseKey);
 
-export const DEFAULT_USER_ID = '6e61325f-0a6f-4404-8e55-f704bde8e5dd';
+// Fixed UUID for anonymous users
+export const ANONYMOUS_USER_ID = '00000000-0000-0000-0000-000000000000';
