@@ -2,48 +2,48 @@ import { useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, X, Edit2, Save } from 'lucide-react';
-import type { FlashcardProposalDto } from '@/types';
+import { Edit2, Save, X, Trash2 } from 'lucide-react';
+import type { FlashcardDto } from '@/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useSupabase } from '@/lib/providers/supabase-provider';
 
-interface FlashcardItemProps {
-  proposal: FlashcardProposalDto;
-  onAccept: () => void;
-  onReject: () => void;
-  onEdit: (front: string, back: string) => void;
+interface FlashcardItemViewProps {
+  flashcard: FlashcardDto;
+  onDelete: (id: number) => void;
+  onEdit: (id: number, front: string, back: string) => void;
   'data-testid'?: string;
 }
 
-export function FlashcardItem({
-  proposal,
-  onAccept,
-  onReject,
+export function FlashcardItemView({
+  flashcard,
+  onDelete,
   onEdit,
   'data-testid': testId,
-}: FlashcardItemProps) {
+}: FlashcardItemViewProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedFront, setEditedFront] = useState(proposal.front);
-  const [editedBack, setEditedBack] = useState(proposal.back);
-  const { user } = useSupabase();
+  const [editedFront, setEditedFront] = useState(flashcard.front);
+  const [editedBack, setEditedBack] = useState(flashcard.back);
 
   const handleStartEdit = useCallback(() => {
     setIsEditing(true);
-    setEditedFront(proposal.front);
-    setEditedBack(proposal.back);
-  }, [proposal.front, proposal.back]);
+    setEditedFront(flashcard.front);
+    setEditedBack(flashcard.back);
+  }, [flashcard.front, flashcard.back]);
 
   const handleSaveEdit = useCallback(() => {
-    onEdit(editedFront, editedBack);
+    onEdit(flashcard.id, editedFront, editedBack);
     setIsEditing(false);
-  }, [editedFront, editedBack, onEdit]);
+  }, [flashcard.id, editedFront, editedBack, onEdit]);
 
   const handleCancelEdit = useCallback(() => {
-    setEditedFront(proposal.front);
-    setEditedBack(proposal.back);
+    setEditedFront(flashcard.front);
+    setEditedBack(flashcard.back);
     setIsEditing(false);
-  }, [proposal.front, proposal.back]);
+  }, [flashcard.front, flashcard.back]);
+
+  const handleDelete = useCallback(() => {
+    onDelete(flashcard.id);
+  }, [flashcard.id, onDelete]);
 
   return (
     <AnimatePresence mode="wait">
@@ -116,67 +116,48 @@ export function FlashcardItem({
               <>
                 <div className="space-y-2">
                   <p className="font-medium" data-testid={`${testId}-front`}>
-                    {proposal.front}
+                    {flashcard.front}
                   </p>
                   <p className="text-gray-600 dark:text-gray-400" data-testid={`${testId}-back`}>
-                    {proposal.back}
+                    {flashcard.back}
                   </p>
                 </div>
-                {user && (
-                  <div className="flex justify-end space-x-2">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleStartEdit}
-                            data-testid={`${testId}-edit-button`}
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Edit flashcard</p>
-                        </TooltipContent>
-                      </Tooltip>
+                <div className="flex justify-end space-x-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleStartEdit}
+                          data-testid={`${testId}-edit-button`}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Edit flashcard</p>
+                      </TooltipContent>
+                    </Tooltip>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={onReject}
-                            className="text-red-600 hover:text-red-700"
-                            data-testid={`${testId}-reject-button`}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Reject flashcard</p>
-                        </TooltipContent>
-                      </Tooltip>
-
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={onAccept}
-                            className="text-green-600 hover:text-green-700"
-                            data-testid={`${testId}-accept-button`}
-                          >
-                            <Check className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Accept flashcard</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </div>
-                )}
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleDelete}
+                          className="text-red-600 hover:text-red-700"
+                          data-testid={`${testId}-delete-button`}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Delete flashcard</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </>
             )}
           </CardContent>

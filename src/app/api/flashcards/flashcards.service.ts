@@ -1,5 +1,5 @@
 import { supabaseClient } from '@/db/supabase.client';
-import { FlashcardsCreateCommand, FlashcardDto } from '@/types';
+import { FlashcardsCreateCommand, FlashcardDto, FlashcardUpdateDto } from '@/types';
 
 // Default user ID for development/testing purposes
 const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
@@ -36,6 +36,34 @@ class FlashcardsService {
     }
 
     return data;
+  }
+
+  async update(id: number, updates: FlashcardUpdateDto): Promise<FlashcardDto> {
+    const { data, error } = await supabaseClient
+      .from('flashcards')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Failed to update flashcard:', error);
+      throw new Error(error.message);
+    }
+
+    return data;
+  }
+
+  async delete(id: number): Promise<void> {
+    const { error } = await supabaseClient
+      .from('flashcards')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Failed to delete flashcard:', error);
+      throw new Error(error.message);
+    }
   }
 }
 

@@ -36,6 +36,7 @@ export function useGetFlashcards() {
 
   return {
     flashcards,
+    setFlashcards,
     isLoading,
     error
   };
