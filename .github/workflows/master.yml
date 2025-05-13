@@ -121,8 +121,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: |
-            pages deploy .vercel/output/static --project-name=10x-cards --commit-dirty=true --branch=main \
-            --env NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} \
-            --env NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }} \
-            --env OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}
+          command: pages deploy .vercel/output/static --project-name=10x-cards --commit-dirty=true --branch=main --env NEXT_PUBLIC_SUPABASE_URL="${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" --env NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" --env OPENROUTER_API_KEY="${{ secrets.OPENROUTER_API_KEY }}"
