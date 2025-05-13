@@ -9,6 +9,22 @@ interface Env {
 export function createSupabaseClient(env: Env) {
   return createClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: false,
+        detectSessionInUrl: false,
+        flowType: 'pkce',
+      },
+      global: {
+        fetch: fetch.bind(globalThis),
+        headers: {
+          'X-Client-Info': '10x-cards-cloudflare'
+        }
+      },
+      db: {
+        schema: 'public'
+      }
+    }
   );
 }

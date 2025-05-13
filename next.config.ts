@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     ? {
         images: {
           unoptimized: true,
-          domains: ['example.supabase.co'],
+          domains: ['zoycpgodfkxzqjcuzlwf.supabase.co'],
         },
         skipTrailingSlashRedirect: true,
         poweredByHeader: false,
@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
     : {
         // Development configuration
         images: {
-          domains: ['example.supabase.co'],
+          domains: ['zoycpgodfkxzqjcuzlwf.supabase.co'],
         },
       }),
   
@@ -45,6 +45,11 @@ const nextConfig: NextConfig = {
         "path": false,
         "os": false,
       }
+    }
+
+    // Set DNS resolution for Supabase requests
+    if (config.resolve && config.resolve.alias) {
+      config.resolve.alias['dns'] = false;
     }
 
     // Optimize chunk size
