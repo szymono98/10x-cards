@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getSession();
 
   // Protected paths
-  const protectedPaths = ['/sets', '/profile', '/my-collection'];
+  const protectedPaths = ['/sets', '/profile'];
   const isProtectedPath = protectedPaths.some((path) => req.nextUrl.pathname.startsWith(path));
 
   // Redirect from protected paths to login
@@ -40,7 +40,6 @@ export const config = {
     '/generate',
     '/sets/:path*',
     '/profile/:path*',
-    '/my-collection/:path*',
     '/auth/:path*'
   ]
 };

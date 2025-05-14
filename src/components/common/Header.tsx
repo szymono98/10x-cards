@@ -34,13 +34,15 @@ export function Header() {
           10x Cards
         </Link>
 
-        <nav className="flex items-center gap-4">
+        <nav className="flex gap-4">
           {user ? (
             <>
               <Button variant="ghost" asChild>
-                <Link href="/my-collection">My Collection</Link>
+                <Link href="/sets">Saved</Link>
               </Button>
-              <span className="text-sm text-gray-600 dark:text-gray-300">{user.email}</span>
+              <Button variant="ghost" asChild>
+                <Link href="/profile">Profile</Link>
+              </Button>
               <Button variant="outline" onClick={handleLogout} disabled={isLoading}>
                 {isLoading ? 'Logging out...' : 'Logout'}
               </Button>
