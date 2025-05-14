@@ -9,8 +9,6 @@ import { useState, useCallback, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 
-export const runtime = 'edge';
-
 interface RegisterFormData {
   email: string;
   password: string;

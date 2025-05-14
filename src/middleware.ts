@@ -2,8 +2,6 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export const runtime = 'experimental-edge';
-
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
@@ -12,7 +10,7 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getSession();
 
   // Protected paths
-  const protectedPaths = ['/sets', '/profile'];
+  const protectedPaths = ['/my-collection'];
   const isProtectedPath = protectedPaths.some((path) => req.nextUrl.pathname.startsWith(path));
 
   // Redirect from protected paths to login
@@ -40,8 +38,7 @@ export const config = {
   matcher: [
     '/',
     '/generate',
-    '/sets/:path*',
-    '/profile/:path*',
+    '/my-collection/:path*',
     '/auth/:path*'
   ]
 };

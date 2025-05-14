@@ -8,8 +8,6 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-export const runtime = 'edge';
-
 interface ResetPasswordFormData {
   email: string;
 }
