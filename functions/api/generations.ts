@@ -9,7 +9,7 @@ interface Env {
   OPENROUTER_API_KEY: string;
 }
 
-const DEFAULT_USER_ID = '6e61325f-0a6f-4404-8e55-f704bde8e5dd';
+const DEFAULT_USER_ID = '00000000-0000-0000-0000-000000000000';
 
 async function generateMD5Hash(message: string): Promise<string> {
   const msgBuffer = new TextEncoder().encode(message);
