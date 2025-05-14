@@ -6,23 +6,23 @@ const nextConfig: NextConfig = {
     ? {
         images: {
           unoptimized: true,
-          domains: ['example.supabase.co'],
+          domains: ['zoycpgodfkxzqjcuzlwf.supabase.co'],
         },
         skipTrailingSlashRedirect: true,
         poweredByHeader: false,
         compress: true,
-        output: 'export', // Changed from 'standalone' to 'export' for Cloudflare Pages
+        output: 'standalone', // Optimize output for Cloudflare Pages
       }
     : {
         // Development configuration
         images: {
-          domains: ['example.supabase.co'],
+          domains: ['zoycpgodfkxzqjcuzlwf.supabase.co'],
         },
       }),
   
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: ['lucide-react'], // Optimize package imports
   },
 
   // Protect sensitive environment variables
@@ -47,6 +47,11 @@ const nextConfig: NextConfig = {
       }
     }
 
+    // Set DNS resolution for Supabase requests
+    if (config.resolve && config.resolve.alias) {
+      config.resolve.alias['dns'] = false;
+    }
+
     // Optimize chunk size
     if (config.optimization && !isServer) {
       config.optimization.splitChunks = {
@@ -59,6 +64,16 @@ const nextConfig: NextConfig = {
 
     return config;
   },
+
+  // Rewrite API routes for Cloudflare Pages
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: '/api/:path*',
+      },
+    ]
+  }
 };
 
 export default nextConfig;

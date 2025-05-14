@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import type { FlashcardDto, FlashcardsCreateCommand } from '@/types';
+import type { FlashcardsCreateCommand, FlashcardDto } from '@/types';
 
-const API_ENDPOINT = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/flashcards` : '/api/flashcards';
+const API_ENDPOINT = process.env.NODE_ENV === 'production' 
+  ? '/functions/api/flashcards'
+  : '/api/flashcards';
 
 export function useSaveFlashcards() {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,5 +38,5 @@ export function useSaveFlashcards() {
     }
   };
 
-  return { save, isLoading, error, setError };
+  return { save, isLoading, error };
 }
