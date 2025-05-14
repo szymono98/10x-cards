@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     ? {
         images: {
           unoptimized: true,
-          domains: ['zoycpgodfkxzqjcuzlwf.supabase.co'],
+          domains: ['example.supabase.co'],
         },
         skipTrailingSlashRedirect: true,
         poweredByHeader: false,
@@ -16,13 +16,19 @@ const nextConfig: NextConfig = {
     : {
         // Development configuration
         images: {
-          domains: ['zoycpgodfkxzqjcuzlwf.supabase.co'],
+          domains: ['example.supabase.co'],
         },
       }),
   
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react'], // Optimize package imports
+  },
+
+  // Protect sensitive environment variables
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   },
 
   // Cloudflare Pages specific configuration
@@ -39,11 +45,6 @@ const nextConfig: NextConfig = {
         "path": false,
         "os": false,
       }
-    }
-
-    // Set DNS resolution for Supabase requests
-    if (config.resolve && config.resolve.alias) {
-      config.resolve.alias['dns'] = false;
     }
 
     // Optimize chunk size
