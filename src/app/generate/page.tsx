@@ -2,6 +2,8 @@ import { FlashcardGenerationView } from '@/components/generate/FlashcardGenerati
 import { RootLayout } from '@/components/layouts/RootLayout';
 import { Metadata } from 'next';
 
+export const runtime = 'edge';
+
 export const metadata: Metadata = {
   title: 'Generowanie fiszek | 10x Cards',
   description: 'Generuj fiszki za pomocą sztucznej inteligencji',
