@@ -25,12 +25,6 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react'], // Optimize package imports
   },
 
-  // Protect sensitive environment variables
-  env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  },
-
   // Cloudflare Pages specific configuration
   typescript: {
     ignoreBuildErrors: true
