@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { GenerateFlashcardsCommand, GenerationCreateResponseDto } from '@/types';
 
-const API_ENDPOINT = '/api/generations';
+const API_ENDPOINT = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/generations` : '/api/generations';
 
 export function useGenerateFlashcards() {
   const [isLoading, setIsLoading] = useState(false);
@@ -42,5 +42,6 @@ export function useGenerateFlashcards() {
     generate,
     isLoading,
     error,
+    setError,
   };
 }

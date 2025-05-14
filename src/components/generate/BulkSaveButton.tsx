@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Save, Loader2 } from 'lucide-react';
+import { useSupabase } from '@/lib/providers/supabase-provider';
 
 interface BulkSaveButtonProps {
   onSaveAccepted: () => Promise<void>;
@@ -14,6 +15,10 @@ export function BulkSaveButton({
   isLoading,
   label = 'Save accepted',
 }: BulkSaveButtonProps) {
+  const { user } = useSupabase();
+
+  if (!user) return null;
+
   return (
     <div className="flex justify-end mt-6">
       <Button

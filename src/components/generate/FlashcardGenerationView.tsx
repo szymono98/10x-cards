@@ -18,10 +18,10 @@ interface FlashcardProposalWithStatus extends FlashcardProposalDto {
 
 export function FlashcardGenerationView() {
   const [text, setText] = useState('');
-  const { generate, isLoading, error } = useGenerateFlashcards();
+  const { generate, isLoading, error: generateError, setError: setGenerateError } = useGenerateFlashcards();
   const [proposals, setProposals] = useState<FlashcardProposalWithStatus[]>([]);
   const [generationId, setGenerationId] = useState<number | null>(null);
-  const { save, isLoading: isSaving, error: saveError } = useSaveFlashcards();
+  const { save, isLoading: isSaving, error: saveError, setError: setSaveError } = useSaveFlashcards();
   const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -131,8 +131,16 @@ export function FlashcardGenerationView() {
           disabled={!text || text.length < 1000 || text.length > 10000 || isLoading}
           isLoading={isLoading}
         />
-        {(error || saveError) && <ErrorNotification message={error || saveError || ''} />}
-        {success && <SuccessNotification message={success} />}
+        {(generateError || saveError) && (
+          <ErrorNotification 
+            message={generateError || saveError || ''} 
+            onDismiss={() => {
+              if (generateError) setGenerateError(null);
+              if (saveError) setSaveError(null);
+            }}
+          />
+        )}
+        {success && <SuccessNotification message={success} onDismiss={() => setSuccess(null)} />}
         {proposals.length > 0 && (
           <>
             <FlashcardList

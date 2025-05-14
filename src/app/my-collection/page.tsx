@@ -11,8 +11,8 @@ import { useEditFlashcard } from '@/hooks/useEditFlashcard';
 import { useCallback, useState, useTransition } from 'react';
 
 export default function MyCollectionPage() {
-  const { flashcards, setFlashcards, isLoading, error } = useGetFlashcards();
-  const { updateFlashcard, deleteFlashcard, error: editError } = useEditFlashcard();
+  const { flashcards, setFlashcards, isLoading, error: fetchError, setError: setFetchError } = useGetFlashcards();
+  const { updateFlashcard, deleteFlashcard, error: editError, setError: setEditError } = useEditFlashcard();
   const [success, setSuccess] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
@@ -81,8 +81,16 @@ export default function MyCollectionPage() {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">My Collection</h1>
 
-        {(error || editError) && <ErrorNotification message={error || editError || ''} />}
-        {success && <SuccessNotification message={success} />}
+        {(fetchError || editError) && (
+          <ErrorNotification 
+            message={fetchError || editError || ''} 
+            onDismiss={() => {
+              if (fetchError) setFetchError(null);
+              if (editError) setEditError(null);
+            }}
+          />
+        )}
+        {success && <SuccessNotification message={success} onDismiss={() => setSuccess(null)} />}
 
         {isLoading ? (
           <SkeletonLoader />

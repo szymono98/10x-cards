@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { FlashcardDto, FlashcardsListResponseDto } from '@/types';
 
-const API_ENDPOINT = process.env.NODE_ENV === 'production' 
-  ? '/functions/api/flashcards'
-  : '/api/flashcards';
+const API_ENDPOINT = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/flashcards` : '/api/flashcards';
 
 export function useGetFlashcards() {
   const [flashcards, setFlashcards] = useState<FlashcardDto[]>([]);
@@ -38,6 +36,7 @@ export function useGetFlashcards() {
     flashcards,
     setFlashcards,
     isLoading,
-    error
+    error,
+    setError
   };
 }
