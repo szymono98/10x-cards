@@ -2,7 +2,7 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge'; // Changed from 'edge' to 'experimental-edge'
 
 export async function middleware(req: NextRequest) {
   try {

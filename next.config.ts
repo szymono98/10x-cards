@@ -36,13 +36,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true
   },
 
-  // Set edge runtime
-  // experimental: {
-  //   runtime: 'edge',
-  //   optimizeCss: true,
-  //   optimizePackageImports: ['lucide-react'], // Optimize package imports
-  // },
-
   // Configure webpack for Cloudflare Pages
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -66,16 +59,6 @@ const nextConfig: NextConfig = {
 
     return config;
   },
-
-  // Rewrite API routes for Cloudflare Pages
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: '/api/:path*',
-      },
-    ]
-  }
 };
 
 export default nextConfig;
