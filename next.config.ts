@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
         skipTrailingSlashRedirect: true,
         poweredByHeader: false,
         compress: true,
-        output: 'standalone', // Optimize output for Cloudflare Pages
+        output: 'export', // Changed from 'standalone' to 'export' for Cloudflare Pages
       }
     : {
         // Development configuration
@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
   
   experimental: {
     optimizeCss: true,
-    optimizePackageImports: ['lucide-react'], // Optimize package imports
+    optimizePackageImports: ['lucide-react'],
   },
 
   // Protect sensitive environment variables
@@ -35,6 +35,13 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true
   },
+
+  // Set edge runtime
+  // experimental: {
+  //   runtime: 'edge',
+  //   optimizeCss: true,
+  //   optimizePackageImports: ['lucide-react'], // Optimize package imports
+  // },
 
   // Configure webpack for Cloudflare Pages
   webpack: (config, { isServer }) => {
