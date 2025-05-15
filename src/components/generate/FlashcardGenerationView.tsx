@@ -10,7 +10,6 @@ import { BulkSaveButton } from '@/components/generate/BulkSaveButton';
 import { ErrorNotification } from '@/components/common/ErrorNotification';
 import { useSaveFlashcards } from '@/hooks/useSaveFlashcards';
 import { SuccessNotification } from '@/components/common/SuccessNotification';
-
 interface FlashcardProposalWithStatus extends FlashcardProposalDto {
   accepted: boolean;
   edited: boolean;
@@ -18,10 +17,20 @@ interface FlashcardProposalWithStatus extends FlashcardProposalDto {
 
 export function FlashcardGenerationView() {
   const [text, setText] = useState('');
-  const { generate, isLoading, error: generateError, setError: setGenerateError } = useGenerateFlashcards();
+  const {
+    generate,
+    isLoading,
+    error: generateError,
+    setError: setGenerateError,
+  } = useGenerateFlashcards();
   const [proposals, setProposals] = useState<FlashcardProposalWithStatus[]>([]);
   const [generationId, setGenerationId] = useState<number | null>(null);
-  const { save, isLoading: isSaving, error: saveError, setError: setSaveError } = useSaveFlashcards();
+  const {
+    save,
+    isLoading: isSaving,
+    error: saveError,
+    setError: setSaveError,
+  } = useSaveFlashcards();
   const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -132,8 +141,8 @@ export function FlashcardGenerationView() {
           isLoading={isLoading}
         />
         {(generateError || saveError) && (
-          <ErrorNotification 
-            message={generateError || saveError || ''} 
+          <ErrorNotification
+            message={generateError || saveError || ''}
             onDismiss={() => {
               if (generateError) setGenerateError(null);
               if (saveError) setSaveError(null);

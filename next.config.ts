@@ -2,35 +2,19 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   // Production configuration for Cloudflare Pages
-  ...(process.env.NODE_ENV === 'production'
-    ? {
-        images: {
-          unoptimized: true,
-          domains: ['zoycpgodfkxzqjcuzlwf.supabase.co'],
-        },
-        skipTrailingSlashRedirect: true,
-        poweredByHeader: false,
-        compress: true,
-        // Remove static export to support middleware and API routes
-        experimental: {
-          webpackBuildWorker: true
-        }
-      }
-    : {
-        // Development configuration
-        images: {
-          domains: ['zoycpgodfkxzqjcuzlwf.supabase.co'],
-        },
-      }),
-  
-  experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['lucide-react'], // Optimize package imports
+  images: {
+    unoptimized: true,
+    domains: ['zoycpgodfkxzqjcuzlwf.supabase.co'],
   },
-  
-  // Ensure proper client-side rendering for dynamic pages
-  unstable_runtimeJS: true,
-  unstable_JsPreload: false,
+  skipTrailingSlashRedirect: true,
+  poweredByHeader: false,
+  compress: true,
+
+  experimental: {
+    webpackBuildWorker: true,
+    optimizeCss: true,
+    optimizePackageImports: ['lucide-react'],
+  },
 
   // Protect sensitive environment variables
   env: {
