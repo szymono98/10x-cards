@@ -9,23 +9,12 @@ export const metadata: Metadata = {
 
 export const runtime = 'edge';
 export const preferredRegion = 'all';
+// Explicitly set dynamic to handle auth state
 export const dynamic = 'force-dynamic';
 
 export default function GeneratePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="animate-in fade-in-50 duration-500">
-          <div className="container mx-auto px-4 py-8">
-            <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-6" />
-            <div className="space-y-6">
-              <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-              <div className="h-12 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-            </div>
-          </div>
-        </div>
-      }
-    >
+    <Suspense fallback={<div>Loading...</div>}>
       <FlashcardGenerationView />
     </Suspense>
   );

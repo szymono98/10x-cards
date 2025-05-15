@@ -119,7 +119,7 @@ export function FlashcardGenerationView() {
       setSaveError(error instanceof Error ? error.message : 'Failed to save flashcards');
       setSuccess(null);
     }
-  }, [proposals, generationId, save, setText]);
+  }, [proposals, generationId, save, setText, setSaveError]);
 
   const handleSaveAll = useCallback(async () => {
     if (!generationId) return;
@@ -144,7 +144,7 @@ export function FlashcardGenerationView() {
       console.error('Failed to save flashcards:', error);
       setSuccess(null);
     }
-  }, [proposals, generationId, save, setText, setSaveError]);
+  }, [proposals, generationId, save, setText]);
 
   return (
     <main className="container mx-auto px-4 py-8">

@@ -1,10 +1,8 @@
 import { RedirectType, redirect } from 'next/navigation';
 
+// Używamy tylko Edge Runtime bez force-static
 export const runtime = 'edge';
-
-// Optymalizacja dla statycznej generacji
-export const dynamic = 'force-static';
-export const revalidate = false;
+export const dynamic = 'force-dynamic';
 
 export default function HomePage() {
   redirect('/generate', RedirectType.replace);

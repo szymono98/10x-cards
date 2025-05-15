@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { AuthProvider } from '@/lib/supabase/context';
 import { SupabaseProvider } from '@/lib/providers/supabase-provider';
+import { Suspense } from 'react';
 
+// Konfiguracja runtime
 export const runtime = 'edge';
 export const preferredRegion = 'all';
-export const dynamic = 'force-dynamic';
+// Używamy auto dla lepszej elastyczności
+export const dynamic = 'auto';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,9 +38,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SupabaseProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </SupabaseProvider>
+        <Suspense fallback={null}>
+          <SupabaseProvider>{children}</SupabaseProvider>
+        </Suspense>
       </body>
     </html>
   );

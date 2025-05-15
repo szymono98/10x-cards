@@ -12,54 +12,42 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  const res = NextResponse.next();
+
   try {
-    const res = NextResponse.next();
     const supabase = createMiddlewareClient({ req, res });
-
-    // Handle data route requests first
-    if (req.nextUrl.pathname.includes('/_next/data/')) {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          res.headers.set('x-session-user', session.user.id);
-          res.headers.set('x-session-token', session.access_token);
-        }
-      } catch (error) {
-        console.error('Error fetching session for data route:', error);
-      }
-      return res;
-    }
-
-    // Get session for other routes
     const { data: { session } } = await supabase.auth.getSession();
-    
-    const pathname = req.nextUrl.pathname;
 
     // Protected paths
-    const protectedPaths = ['/my-collection'];
-    const isProtectedPath = protectedPaths.some((path) => pathname.startsWith(path));
+    const protectedPaths = ['/my-collection', '/generate'];
+    const isProtectedPath = protectedPaths.some((path) => req.nextUrl.pathname.startsWith(path));
 
-    // Redirect from protected paths to login
-    if (isProtectedPath && !session) {
+    // Handle auth redirects
+    if (!session && isProtectedPath) {
       const redirectUrl = new URL('/auth/login', req.url);
+      redirectUrl.searchParams.set('returnTo', req.nextUrl.pathname);
       return NextResponse.redirect(redirectUrl);
     }
 
-    // Handle /auth/login redirect only when user is logged in and not registering
-    if (pathname === '/auth/login' && session) {
-      const { user } = session;
-      const isRegistering = user.user_metadata?.registration === true;
+    if (session) {
+      // Add session headers for data routes
+      if (req.nextUrl.pathname.includes('/_next/data/')) {
+        res.headers.set('x-session-user', session.user.id);
+        res.headers.set('x-session-token', session.access_token);
+      }
 
-      if (!isRegistering) {
-        const redirectUrl = new URL('/generate', req.url);
-        return NextResponse.redirect(redirectUrl);
+      // Redirect logged-in users from auth pages to generate
+      if (req.nextUrl.pathname.startsWith('/auth/')) {
+        return NextResponse.redirect(new URL('/generate', req.url));
       }
     }
 
     return res;
   } catch (error) {
-    console.error('Error in middleware:', error);
-    return NextResponse.next();
+    console.error('Middleware error:', error);
+    // W przypadku błędu, pozwól na kontynuację żądania
+    // Edge runtime będzie mógł obsłużyć błąd na poziomie strony
+    return res;
   }
 }
 
