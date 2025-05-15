@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
         skipTrailingSlashRedirect: true,
         poweredByHeader: false,
         compress: true,
-        output: 'export',
+        // Remove static export to support middleware and API routes
         experimental: {
           webpackBuildWorker: true
         }

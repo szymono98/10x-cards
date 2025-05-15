@@ -33,13 +33,12 @@ export async function middleware(req: NextRequest) {
   return res;
 }
 
-// Update matcher to be more specific and Cloudflare-compatible
+// Configure middleware matcher
 export const config = {
   matcher: [
     '/',
     '/generate',
     '/my-collection/:path*',
     '/auth/:path*'
-  ],
-  runtime: 'experimental-edge'  // Using experimental-edge runtime for Cloudflare compatibility
+  ]
 };
