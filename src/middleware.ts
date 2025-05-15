@@ -5,11 +5,16 @@ import type { NextRequest } from 'next/server';
 export async function middleware(req: NextRequest) {
   // Early return for static assets and API routes
   if (
-    req.nextUrl.pathname.startsWith('/_next/static') ||
+    req.nextUrl.pathname.startsWith('/_next') ||
     req.nextUrl.pathname.startsWith('/api') ||
     req.nextUrl.pathname.match(/\.(ico|png|jpg|jpeg|svg)$/)
   ) {
     return NextResponse.next();
+  }
+
+  // Handle root path early
+  if (req.nextUrl.pathname === '/') {
+    return NextResponse.redirect(new URL('/generate', req.url));
   }
 
   const res = NextResponse.next();
@@ -25,17 +30,11 @@ export async function middleware(req: NextRequest) {
 
     if (sessionError) {
       console.error('Session error:', sessionError);
-      // Na błąd sesji, przekieruj do logowania
-      if (req.nextUrl.pathname !== '/auth/login') {
+      // W przypadku błędu sesji, pozwól na dostęp do publicznych ścieżek
+      if (!req.nextUrl.pathname.startsWith('/auth/')) {
         return NextResponse.redirect(new URL('/auth/login', req.url));
       }
       return res;
-    }
-
-    // Dodaj nagłówki sesji do odpowiedzi
-    if (session) {
-      res.headers.set('x-session-user', session.user.id);
-      res.headers.set('x-session-token', session.access_token);
     }
 
     // Protected paths logic
@@ -55,29 +54,32 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL('/generate', req.url));
     }
 
-    // Przekierowanie z root path
-    if (req.nextUrl.pathname === '/') {
-      return NextResponse.redirect(new URL('/generate', req.url));
-    }
-
     return res;
   } catch (error) {
     console.error('Middleware critical error:', error);
-    // W przypadku krytycznego błędu, przekieruj do strony logowania
-    if (req.nextUrl.pathname !== '/auth/login') {
+    
+    // W przypadku krytycznego błędu, pozwól na kontynuację dla statycznych assetów
+    if (req.nextUrl.pathname.startsWith('/_next/static')) {
+      return NextResponse.next();
+    }
+    
+    // Dla pozostałych ścieżek, przekieruj do logowania
+    if (!req.nextUrl.pathname.startsWith('/auth/')) {
       return NextResponse.redirect(new URL('/auth/login', req.url));
     }
+    
     return res;
   }
 }
 
-// Configure middleware matcher
 export const config = {
   matcher: [
-    '/',
-    '/generate',
-    '/my-collection/:path*',
-    '/auth/:path*',
-    '/_next/data/:path*'
-  ]
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 };

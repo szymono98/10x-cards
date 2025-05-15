@@ -10,9 +10,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
 
-  // Optymalizacje statycznej generacji
-  staticPageGenerationTimeout: 120,
+  // Optymalizacja dla Cloudflare Pages
   output: 'standalone',
+  
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react'],
@@ -21,13 +21,12 @@ const nextConfig: NextConfig = {
   // Cache control dla statycznych assetów
   headers: async () => [
     {
-      source: '/(.*)',
-      headers: [
-        {
-          key: 'Cache-Control',
-          value: 'public, max-age=31536000, immutable',
-        },
-      ],
+      source: '/_next/static/:path*',
+      headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+    },
+    {
+      source: '/static/:path*',
+      headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
     },
   ],
 
@@ -45,7 +44,6 @@ const nextConfig: NextConfig = {
   // Configure webpack for Cloudflare Pages
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Cloudflare Pages Node polyfills
       config.resolve.fallback = {
         ...config.resolve.fallback,
         "fs": false,
@@ -75,7 +73,6 @@ const nextConfig: NextConfig = {
 
     return config;
   },
-
 };
 
 export default nextConfig;
