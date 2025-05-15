@@ -30,6 +30,14 @@ const nextConfig: NextConfig = {
     },
   ],
 
+  // Add rewrites to ensure proper API routing
+  rewrites: async () => [
+    {
+      source: '/api/:path*',
+      destination: '/functions/api/:path*',
+    },
+  ],
+
   // Protect sensitive environment variables
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

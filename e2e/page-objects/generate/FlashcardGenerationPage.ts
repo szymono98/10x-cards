@@ -6,7 +6,7 @@ export class FlashcardGenerationPage {
 
   // Selektory
   private sourceTextInput = this.page.getByTestId('source-text-input');
-  private generateButton = this.page.getByTestId('generate-flashcards-button');
+  private generateButton = this.page.getByTestId('generate-button');
   private flashcardsList = this.page.getByTestId('flashcards-list');
   private saveAcceptedButton = this.page.getByTestId('save-accepted-button');
   private saveAllButton = this.page.getByTestId('save-all-button');

@@ -40,12 +40,12 @@ const mockGenerationResponse: GenerationCreateResponseDto = {
 // Define your API mocking handlers
 export const handlers = [
   // GET flashcards
-  http.get('/functions/api/flashcards', () => {
+  http.get('/api/flashcards', () => {
     return HttpResponse.json(mockFlashcards);
   }),
 
   // POST flashcards
-  http.post('/functions/api/flashcards', async ({ request }) => {
+  http.post('/api/flashcards', async ({ request }) => {
     const newFlashcard = (await request.json()) as FlashcardsCreateCommand;
     return HttpResponse.json({
       flashcards: newFlashcard.flashcards.map(card => ({
@@ -59,7 +59,7 @@ export const handlers = [
   }),
 
   // Generations
-  http.post('/functions/api/generations', async ({ request }) => {
+  http.post('/api/generations', async ({ request }) => {
     const body = await request.json() as { source_text: string };
     
     // Simulate server error for specific test case

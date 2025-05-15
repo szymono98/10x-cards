@@ -14,7 +14,7 @@ export function GenerateButton({ onClick, disabled, isLoading }: GenerateButtonP
       disabled={disabled}
       size="lg"
       className="w-full font-medium shadow hover:shadow-indigo-500/20 transition-all"
-      data-testid="generate-flashcards-button"
+      data-testid="generate-button"
     >
       {isLoading ? (
         <>

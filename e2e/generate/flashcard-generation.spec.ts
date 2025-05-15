@@ -2,7 +2,75 @@ import { test, expect } from '@playwright/test';
 import { FlashcardGenerationPage } from '../page-objects/generate/FlashcardGenerationPage';
 
 test.describe('Flashcard Generation', () => {
+  test.use({ storageState: { cookies: [], origins: [{ origin: 'http://localhost:3000', localStorage: [] }] } });
   test.beforeEach(async ({ page }) => {
+        await page.route('**/auth/v1/user', (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a',
+          email: 'test@example.com',
+          app_metadata: {
+            provider: 'email'
+          },
+          user_metadata: {
+            name: 'Test User'
+          }
+        })
+      });
+    });
+
+    // Mock the current session and log requests
+    await page.route('**', async (route) => {
+      const request = route.request();
+      console.log('Intercepted request:', request.url());
+
+      if (request.url().includes('auth/v1/session')) {
+        console.log('Handling auth session request');
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            data: {
+              user: {
+                id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a',
+                email: 'test@example.com',
+                app_metadata: { provider: 'email' },
+                user_metadata: { name: 'Test User' }
+              },
+              session: {
+                access_token: 'test-token',
+                expires_in: 3600
+              }
+            },
+            error: null
+          })
+        });
+      }
+      
+      return route.continue();
+    });
+
+    // Mock Supabase auth state change event
+    await page.route('**/realtime/v1/websocket', (route) => {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          event: 'SIGNED_IN',
+          session: {
+            user: {
+              id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a',
+              email: 'test@example.com'
+            }
+          }
+        })
+      });
+    });
+
+    await page.goto('/generate');
+
     // Mock the generations endpoint
     await page.route('/api/generations', async (route) => {
       const request = route.request();
@@ -77,18 +145,19 @@ test.describe('Flashcard Generation', () => {
     const flashcardPage = new FlashcardGenerationPage(page);
     const sampleText = 'a'.repeat(1500); // Zapewniamy tekst o długości powyżej 1000 znaków
 
-    // Generowanie fiszek
+    // Generate flashcards and wait for the list to appear
     await flashcardPage.generateFlashcards(sampleText);
-
-    // Weryfikacja czy lista fiszek się pojawiła
     await expect(page.getByTestId('flashcards-list')).toBeVisible();
 
-    // Akceptacja pierwszych dwóch fiszek
+    // Accept first two flashcards
     await flashcardPage.acceptFlashcard(0);
     await flashcardPage.acceptFlashcard(1);
 
-    // Zapisanie zaakceptowanych fiszek
-    await flashcardPage.saveAcceptedFlashcards();
+    // Wait for the save button to appear and be enabled
+    const saveButton = page.getByTestId('save-accepted-button');
+    await expect(saveButton).toBeVisible({ timeout: 10000 });
+    await expect(saveButton).toBeEnabled({ timeout: 10000 });
+    await saveButton.click();
 
     // Assert
     // Sprawdzenie czy pojawił się komunikat o sukcesie
@@ -109,19 +178,19 @@ test.describe('Flashcard Generation', () => {
 
     // Act & Assert
     // Początkowo przycisk powinien być wyłączony
-    await expect(page.getByTestId('generate-flashcards-button')).toBeDisabled();
+    await expect(page.getByTestId('generate-button')).toBeDisabled();
 
     // Tekst krótszy niż 1000 znaków
     await flashcardPage.enterSourceText('a'.repeat(999));
-    await expect(page.getByTestId('generate-flashcards-button')).toBeDisabled();
+    await expect(page.getByTestId('generate-button')).toBeDisabled();
 
     // Tekst dłuższy niż 10000 znaków
     await flashcardPage.enterSourceText('a'.repeat(10001));
-    await expect(page.getByTestId('generate-flashcards-button')).toBeDisabled();
+    await expect(page.getByTestId('generate-button')).toBeDisabled();
 
     // Poprawna długość tekstu
     await flashcardPage.enterSourceText('a'.repeat(1500));
-    await expect(page.getByTestId('generate-flashcards-button')).toBeEnabled();
+    await expect(page.getByTestId('generate-button')).toBeEnabled();
   });
 
   test('should handle server errors gracefully', async ({ page }) => {
