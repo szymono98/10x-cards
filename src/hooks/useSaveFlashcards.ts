@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { FlashcardDto, FlashcardsCreateCommand } from '@/types';
 
-const API_ENDPOINT = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/flashcards` : '/api/flashcards';
+const API_ENDPOINT = '/functions/api/flashcards';
 
 export function useSaveFlashcards() {
   const [isLoading, setIsLoading] = useState(false);
