@@ -68,15 +68,6 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // Rewrite API routes for Cloudflare Pages
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: '/api/:path*',
-      },
-    ]
-  }
 };
 
 export default nextConfig;

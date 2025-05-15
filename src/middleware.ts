@@ -41,5 +41,5 @@ export const config = {
     '/my-collection/:path*',
     '/auth/:path*'
   ],
-  runtime: 'edge'  // This ensures Cloudflare compatibility
+  runtime: 'experimental-edge'  // Using experimental-edge runtime for Cloudflare compatibility
 };
