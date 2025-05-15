@@ -1,5 +1,5 @@
 import { GenerateFlashcardsCommand } from '../../src/types';
-import { validateGenerateCommand } from '../../src/app/api/generations/generations.validation';
+import { validateGenerateCommand } from './validation/generations.validation';
 import { createSupabaseClient } from '../../src/lib/supabase.functions';
 import { OpenRouterService } from '../../src/lib/openrouter.service';
 

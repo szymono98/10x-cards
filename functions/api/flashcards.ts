@@ -1,5 +1,5 @@
 import { FlashcardsCreateCommand } from '../../src/types';
-import { validateFlashcardsCommand } from '../../src/app/api/flashcards/flashcards.validation';
+import { validateFlashcardsCommand } from './validation/flashcards.validation';
 import { createSupabaseClient } from '../../src/lib/supabase.functions';
 
 interface Env {
