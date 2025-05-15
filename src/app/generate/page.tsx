@@ -7,10 +7,9 @@ export const metadata: Metadata = {
   description: 'Generuj fiszki za pomocą sztucznej inteligencji',
 };
 
-// This ensures the page is static
-export function generateStaticParams() {
-  return [];
-}
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 export default function GeneratePage() {
   return (
