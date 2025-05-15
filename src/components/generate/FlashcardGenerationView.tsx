@@ -42,7 +42,13 @@ export function FlashcardGenerationView() {
     };
 
     try {
+      setGenerateError(null);
       const result = await generate(command);
+
+      if (!result?.generation_id || !result?.flashcards_proposals) {
+        throw new Error('Invalid response from generation service');
+      }
+
       setGenerationId(result.generation_id);
       setProposals(
         result.flashcards_proposals.map((proposal) => ({
@@ -53,6 +59,8 @@ export function FlashcardGenerationView() {
       );
     } catch (error) {
       console.error('Failed to generate flashcards:', error);
+      setGenerateError(error instanceof Error ? error.message : 'Failed to generate flashcards');
+      setProposals([]);
     }
   };
 
@@ -77,8 +85,12 @@ export function FlashcardGenerationView() {
   }, []);
 
   const handleSaveAccepted = useCallback(async () => {
-    if (!generationId) return;
+    if (!generationId) {
+      setSaveError('No generation ID found');
+      return;
+    }
     setSuccess(null);
+    setSaveError(null);
 
     const acceptedFlashcards = proposals
       .filter((p) => p.accepted)
@@ -88,6 +100,11 @@ export function FlashcardGenerationView() {
         source: p.edited ? ('ai-edited' as const) : ('ai-full' as const),
         generation_id: generationId,
       }));
+
+    if (acceptedFlashcards.length === 0) {
+      setSaveError('No flashcards selected to save');
+      return;
+    }
 
     try {
       await save({ flashcards: acceptedFlashcards });
@@ -99,8 +116,8 @@ export function FlashcardGenerationView() {
       });
     } catch (error) {
       console.error('Failed to save flashcards:', error);
+      setSaveError(error instanceof Error ? error.message : 'Failed to save flashcards');
       setSuccess(null);
-      throw error;
     }
   }, [proposals, generationId, save, setText]);
 
@@ -126,9 +143,8 @@ export function FlashcardGenerationView() {
     } catch (error) {
       console.error('Failed to save flashcards:', error);
       setSuccess(null);
-      throw error;
     }
-  }, [proposals, generationId, save, setText]);
+  }, [proposals, generationId, save, setText, setSaveError]);
 
   return (
     <main className="container mx-auto px-4 py-8">

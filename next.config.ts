@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
   compress: true,
 
   experimental: {
-    webpackBuildWorker: true,
     optimizeCss: true,
     optimizePackageImports: ['lucide-react'],
   },
@@ -30,12 +29,16 @@ const nextConfig: NextConfig = {
   // Configure webpack for Cloudflare Pages
   webpack: (config, { isServer }) => {
     if (!isServer) {
+      // Cloudflare Pages Node polyfills
       config.resolve.fallback = {
         ...config.resolve.fallback,
         "fs": false,
         "path": false,
         "os": false,
-      }
+        "net": false,
+        "tls": false,
+        "crypto": require.resolve('crypto-browserify'),
+      };
     }
 
     // Set DNS resolution for Supabase requests
