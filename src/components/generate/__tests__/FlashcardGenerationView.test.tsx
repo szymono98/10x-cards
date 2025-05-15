@@ -83,7 +83,7 @@ describe('FlashcardGenerationView', () => {
       generate: mockGenerate,
       isLoading: false,
       error: null,
-      setError: vi.fn()
+      setError: vi.fn(),
     });
     (useSaveFlashcards as Mock).mockReturnValue({
       save: mockSave,
@@ -196,7 +196,7 @@ describe('FlashcardGenerationView', () => {
         generate: mockGenerate,
         isLoading: false,
         error: 'Generation failed',
-        setError: vi.fn()
+        setError: vi.fn(),
       });
 
       render(<FlashcardGenerationView />);

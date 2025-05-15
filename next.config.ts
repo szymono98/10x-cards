@@ -38,6 +38,7 @@ const nextConfig: NextConfig = {
         "net": false,
         "tls": false,
         "crypto": require.resolve('crypto-browserify'),
+        "stream": require.resolve('stream-browserify'),
       };
     }
 
