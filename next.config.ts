@@ -11,7 +11,10 @@ const nextConfig: NextConfig = {
         skipTrailingSlashRedirect: true,
         poweredByHeader: false,
         compress: true,
-        output: 'standalone', // Optimize output for Cloudflare Pages
+        output: 'export',
+        experimental: {
+          webpackBuildWorker: true
+        }
       }
     : {
         // Development configuration

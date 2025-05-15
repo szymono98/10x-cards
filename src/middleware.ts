@@ -40,5 +40,6 @@ export const config = {
     '/generate',
     '/my-collection/:path*',
     '/auth/:path*'
-  ]
+  ],
+  runtime: 'edge'  // This ensures Cloudflare compatibility
 };
