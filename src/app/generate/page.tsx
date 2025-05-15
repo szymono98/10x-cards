@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   description: 'Generuj fiszki za pomocą sztucznej inteligencji',
 };
 
-// Make sure we're using ISR for this page
-export const revalidate = 3600; // revalidate every hour
+// Turn off static optimization for this page
+export const dynamic = 'force-dynamic';
 
 export default function GeneratePage() {
   return (
