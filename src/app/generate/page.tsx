@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description: 'Generuj fiszki za pomocą sztucznej inteligencji',
 };
 
+// This ensures the page is static
+export function generateStaticParams() {
+  return [];
+}
+
 export default function GeneratePage() {
   return (
     <RootLayout>

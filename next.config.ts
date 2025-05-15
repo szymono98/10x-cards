@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react'], // Optimize package imports
   },
+  
+  // Ensure proper client-side rendering for dynamic pages
+  unstable_runtimeJS: true,
+  unstable_JsPreload: false,
 
   // Protect sensitive environment variables
   env: {
