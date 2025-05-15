@@ -4,6 +4,8 @@ import './globals.css';
 import { AuthProvider } from '@/lib/supabase/context';
 import { SupabaseProvider } from '@/lib/providers/supabase-provider';
 
+export const runtime = 'edge';
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],

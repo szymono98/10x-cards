@@ -10,14 +10,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 interface FlashcardItemViewProps {
   flashcard: FlashcardDto;
   onDelete: (id: number) => void;
-  onEdit: (id: number, front: string, back: string) => void;
+  onSave: (id: number, front: string, back: string) => void;
   'data-testid'?: string;
 }
 
 export function FlashcardItemView({
   flashcard,
   onDelete,
-  onEdit,
+  onSave,
   'data-testid': testId,
 }: FlashcardItemViewProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -31,9 +31,9 @@ export function FlashcardItemView({
   }, [flashcard.front, flashcard.back]);
 
   const handleSaveEdit = useCallback(() => {
-    onEdit(flashcard.id, editedFront, editedBack);
+    onSave(flashcard.id, editedFront, editedBack);
     setIsEditing(false);
-  }, [flashcard.id, editedFront, editedBack, onEdit]);
+  }, [flashcard.id, editedFront, editedBack, onSave]);
 
   const handleCancelEdit = useCallback(() => {
     setEditedFront(flashcard.front);
