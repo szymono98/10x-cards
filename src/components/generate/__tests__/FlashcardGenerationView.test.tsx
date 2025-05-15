@@ -83,11 +83,13 @@ describe('FlashcardGenerationView', () => {
       generate: mockGenerate,
       isLoading: false,
       error: null,
+      setError: vi.fn()
     });
     (useSaveFlashcards as Mock).mockReturnValue({
       save: mockSave,
       isLoading: false,
       error: null,
+      setError: vi.fn(),
     });
   });
 
@@ -143,8 +145,15 @@ describe('FlashcardGenerationView', () => {
         expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
       });
 
-      // Accept and save flashcard
-      fireEvent.click(screen.getByText('Accept'));
+      // Accept the flashcard first
+      fireEvent.click(screen.getAllByText('Accept')[0]);
+
+      // Wait for the save button to be enabled
+      await waitFor(() => {
+        expect(screen.getByTestId('save-accepted-button')).not.toBeDisabled();
+      });
+
+      // Now save the accepted flashcard
       fireEvent.click(screen.getByTestId('save-accepted-button'));
 
       // Verify save was called with correct data
@@ -187,6 +196,7 @@ describe('FlashcardGenerationView', () => {
         generate: mockGenerate,
         isLoading: false,
         error: 'Generation failed',
+        setError: vi.fn()
       });
 
       render(<FlashcardGenerationView />);
@@ -250,8 +260,15 @@ describe('FlashcardGenerationView', () => {
         expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
       });
 
-      // Accept a flashcard and trigger save
-      fireEvent.click(screen.getByText('Accept'));
+      // Accept the flashcard first
+      fireEvent.click(screen.getAllByText('Accept')[0]);
+
+      // Wait for the save button to be enabled
+      await waitFor(() => {
+        expect(screen.getByTestId('save-accepted-button')).not.toBeDisabled();
+      });
+
+      // Now save the accepted flashcard
       fireEvent.click(screen.getByTestId('save-accepted-button'));
 
       // Verify that UI remains responsive during the transition
@@ -347,7 +364,11 @@ describe('FlashcardGenerationView', () => {
       });
 
       // Save all flashcards
-      fireEvent.click(screen.getByTestId('save-all-button'));
+      const saveAllButton = screen.getByTestId('save-all-button');
+      await waitFor(() => {
+        expect(saveAllButton).not.toBeDisabled();
+      });
+      fireEvent.click(saveAllButton);
 
       // Verify save was called with all flashcards
       expect(mockSave).toHaveBeenCalledWith(
