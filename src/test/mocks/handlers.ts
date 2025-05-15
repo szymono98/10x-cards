@@ -39,27 +39,12 @@ const mockGenerationResponse: GenerationCreateResponseDto = {
 
 // Define your API mocking handlers
 export const handlers = [
-  // GET flashcards - both paths
-  http.get('/api/flashcards', () => {
-    return HttpResponse.json(mockFlashcards);
-  }),
+  // GET flashcards
   http.get('/functions/api/flashcards', () => {
     return HttpResponse.json(mockFlashcards);
   }),
 
-  // POST flashcards - both paths
-  http.post('/api/flashcards', async ({ request }) => {
-    const newFlashcard = (await request.json()) as FlashcardsCreateCommand;
-    return HttpResponse.json({
-      flashcards: newFlashcard.flashcards.map(card => ({
-        ...card,
-        id: `mock-${Date.now()}`,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        user_id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a'
-      }))
-    });
-  }),
+  // POST flashcards
   http.post('/functions/api/flashcards', async ({ request }) => {
     const newFlashcard = (await request.json()) as FlashcardsCreateCommand;
     return HttpResponse.json({
@@ -73,11 +58,18 @@ export const handlers = [
     });
   }),
 
-  // Generations - both paths
-  http.post('/api/generations', async () => {
-    return HttpResponse.json(mockGenerationResponse);
-  }),
-  http.post('/functions/api/generations', async () => {
+  // Generations
+  http.post('/functions/api/generations', async ({ request }) => {
+    const body = await request.json() as { source_text: string };
+    
+    // Simulate server error for specific test case
+    if (body.source_text === 'React and TypeScript basics') {
+      return new HttpResponse(
+        JSON.stringify({ error: 'Failed to generate flashcards' }),
+        { status: 500 }
+      );
+    }
+
     return HttpResponse.json(mockGenerationResponse);
   }),
 ];
