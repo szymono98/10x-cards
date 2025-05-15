@@ -30,11 +30,11 @@ const nextConfig: NextConfig = {
     },
   ],
 
-  // Poprawiona konfiguracja dla Cloudflare Pages API
+  // Add rewrites to ensure proper API routing
   rewrites: async () => [
     {
       source: '/api/:path*',
-      destination: '/api/:path*',
+      destination: '/functions/api/:path*',
     },
   ],
 
