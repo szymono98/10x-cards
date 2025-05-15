@@ -3,15 +3,25 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
+  // Skip middleware for static files and API routes
+  if (
+    req.nextUrl.pathname.startsWith('/_next') ||
+    req.nextUrl.pathname.startsWith('/api')
+  ) {
+    return NextResponse.next();
+  }
+
   const res = NextResponse.next();
   const supabase = createMiddlewareClient({ req, res });
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
+  const pathname = req.nextUrl.pathname;
+
   // Protected paths
   const protectedPaths = ['/my-collection'];
-  const isProtectedPath = protectedPaths.some((path) => req.nextUrl.pathname.startsWith(path));
+  const isProtectedPath = protectedPaths.some((path) => pathname.startsWith(path));
 
   // Redirect from protected paths to login
   if (isProtectedPath && !session) {
@@ -19,8 +29,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Handle /auth/login redirect only when user is logged in
-  if (req.nextUrl.pathname === '/auth/login' && session) {
+  // Handle /auth/login redirect only when user is logged in and not registering
+  if (pathname === '/auth/login' && session) {
     const { user } = session;
     const isRegistering = user.user_metadata?.registration === true;
 
