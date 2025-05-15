@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   description: 'Sign in or create an account for 10x Cards',
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+// Optymalizacja dla statycznej generacji
+export const dynamic = 'force-static';
+export const revalidate = false;
+
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

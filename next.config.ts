@@ -10,10 +10,26 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
 
+  // Optymalizacje statycznej generacji
+  staticPageGenerationTimeout: 120,
+  output: 'standalone',
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react'],
   },
+
+  // Cache control dla statycznych assetów
+  headers: async () => [
+    {
+      source: '/(.*)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, max-age=31536000, immutable',
+        },
+      ],
+    },
+  ],
 
   // Protect sensitive environment variables
   env: {
