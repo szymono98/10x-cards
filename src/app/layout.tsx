@@ -4,12 +4,6 @@ import './globals.css';
 import { SupabaseProvider } from '@/lib/providers/supabase-provider';
 import { Suspense } from 'react';
 
-// Konfiguracja runtime
-export const runtime = 'edge';
-export const preferredRegion = 'all';
-// Używamy auto dla lepszej elastyczności
-export const dynamic = 'auto';
-
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
