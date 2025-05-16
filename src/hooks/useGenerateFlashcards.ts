@@ -21,11 +21,13 @@ export function useGenerateFlashcards() {
           body: JSON.stringify(command),
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const message = data?.error || `HTTP error! status: ${response.status}`;
+          throw new Error(message);
         }
 
-        const data = await response.json();
         return data;
       } catch (error) {
         const message = error instanceof Error ? error.message : 'An error occurred';
