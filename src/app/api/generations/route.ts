@@ -61,12 +61,37 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
 
-    // Debugowanie tokenu
-    console.log('Auth token:', token.substring(0, 10) + '...');
+    // Debugowanie sesji
+    console.log('Setting up session with token:', {
+      tokenLength: token.length,
+      urlConfig: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      anonKeyConfig: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    });
 
-    // Ustawiamy token i od razu próbujemy pobrać użytkownika
-    await supabase.auth.setSession({ access_token: token, refresh_token: '' });
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    // Próba utworzenia sesji z pełną konfiguracją
+    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+      access_token: token,
+      refresh_token: ''
+    });
+
+    if (sessionError) {
+      console.error('Session setup failed:', sessionError);
+      return new Response(JSON.stringify({ 
+        error: 'Session initialization failed', 
+        details: sessionError.message 
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Session setup successful:', {
+      hasSession: !!sessionData.session,
+      hasUser: !!sessionData.user
+    });
+
+    // Próba pobrania użytkownika z utworzonej sesji
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
     if (userError || !user) {
       console.error('User error details:', userError);
