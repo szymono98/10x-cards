@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { GenerateFlashcardsCommand } from '../../src/types';
 import { validateGenerateCommand } from './validation/generations.validation';
 import { createSupabaseClient } from '../../src/lib/supabase.functions';
