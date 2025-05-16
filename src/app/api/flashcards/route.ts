@@ -65,16 +65,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Create supabase client with auth context
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized - Missing token' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-    const token = authHeader.split(' ')[1];
-
     const body = await request.json();
     console.log('Received flashcards request:', body);
     const validation = validateFlashcardsCommand(body);
@@ -88,47 +78,27 @@ export async function POST(request: NextRequest) {
 
     const command = body as FlashcardsCreateCommand;
 
+    // Check if user is authenticated
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized - Must be logged in to save flashcards' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const token = authHeader.split(' ')[1];
     const supabase = createSupabaseClient({
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
 
-    // Próba pobrania użytkownika bezpośrednio z tokena
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-
-    if (userError) {
+    if (userError || !user?.id) {
       console.error('User retrieval failed:', userError);
       return new Response(JSON.stringify({ 
         error: 'Authentication failed', 
-        details: userError.message 
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    if (!user) {
-      console.error('No user found with token');
-      return new Response(JSON.stringify({ 
-        error: 'Authentication failed', 
-        details: 'No user found' 
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log('User authenticated successfully:', {
-      userId: user.id,
-      email: user.email
-    });
-
-    // Dodatkowe sprawdzenie czy mamy ID użytkownika
-    if (!user.id) {
-      console.error('User object:', user);
-      return new Response(JSON.stringify({ 
-        error: 'Invalid user data', 
-        details: 'Missing user ID' 
+        details: userError?.message || 'Invalid user data' 
       }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
