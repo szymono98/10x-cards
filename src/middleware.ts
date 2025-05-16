@@ -4,16 +4,21 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
   // Debug logging
-  console.log(`[Middleware] Processing request for: ${req.nextUrl.pathname}`);
-  console.log(`[Middleware] Request headers:`, Object.fromEntries(req.headers));
-
+  console.log('[Middleware] Request details:', {
+    pathname: req.nextUrl.pathname,
+    method: req.method,
+    host: req.headers.get('host'),
+    userAgent: req.headers.get('user-agent'),
+    referer: req.headers.get('referer')
+  });
+  
   // Early return for static assets and API routes
   if (
     req.nextUrl.pathname.startsWith('/_next') ||
     req.nextUrl.pathname.startsWith('/api') ||
     req.nextUrl.pathname.match(/\.(ico|png|jpg|jpeg|svg)$/)
   ) {
-    console.log('[Middleware] Early return for static asset');
+    console.log('[Middleware] Early return for static asset:', req.nextUrl.pathname);
     return NextResponse.next();
   }
 
@@ -27,7 +32,10 @@ export async function middleware(req: NextRequest) {
 
   try {
     console.log('[Middleware] Creating Supabase client');
-    const supabase = createMiddlewareClient({ req, res });
+    const supabase = createMiddlewareClient({ 
+      req, 
+      res,
+    });
 
     // Try to get the session
     console.log('[Middleware] Fetching session');
@@ -71,6 +79,7 @@ export async function middleware(req: NextRequest) {
     // Dodaj nagłówki diagnostyczne
     res.headers.set('x-middleware-cache', 'no-cache');
     res.headers.set('x-middleware-handled', 'true');
+    res.headers.set('x-environment', process.env.NODE_ENV || 'development');
     if (session) {
       res.headers.set('x-session-user', session.user.id);
     }
@@ -85,8 +94,12 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next();
     }
     
-    // Dla pozostałych ścieżek, pokaż stronę logowania
-    if (!req.nextUrl.pathname.startsWith('/auth/')) {
+    // Dla pozostałych ścieżek, pozwól na kontynuację jeśli nie jest to chroniona ścieżka
+    const isProtectedPath = ['/my-collection'].some(path => 
+      req.nextUrl.pathname.startsWith(path)
+    );
+    
+    if (isProtectedPath) {
       return NextResponse.redirect(new URL('/auth/login', req.url));
     }
     

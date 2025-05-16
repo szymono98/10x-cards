@@ -4,21 +4,17 @@ import { type Database } from './database.types';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-const url = new URL(supabaseUrl);
-
 export const supabaseClient = createClient<Database>(supabaseUrl, supabaseKey, {
   auth: {
-    persistSession: false,
+    persistSession: true,
     detectSessionInUrl: false,
     flowType: 'pkce',
-    autoRefreshToken: true
+    autoRefreshToken: true,
+    storage: typeof window !== 'undefined' ? window.localStorage : undefined
   },
   global: {
-    fetch: fetch.bind(globalThis),
     headers: {
-      'X-Client-Info': '10x-cards-cloudflare',
-      'Origin': 'https://10x-cards.pages.dev',
-      'Host': url.hostname
+      'X-Client-Info': '10x-cards-cloudflare'
     }
   },
   db: {

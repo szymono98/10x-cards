@@ -96,14 +96,23 @@ export async function onRequestPost({ request, env }: { request: Request; env: E
       // Generate flashcards using AI
       let response;
       try {
+        console.log('Sending request to OpenRouter API with config:', {
+          model: 'openai/gpt-4o-mini',
+          temperature: 0.7,
+          textLength: command.source_text.length,
+          apiKeyPresent: !!env.OPENROUTER_API_KEY,
+        });
+
         response = await openRouter.chatCompletion({
           messages: [
             {
               role: 'system',
-              content: `You are an expert in creating educational flashcards. Based on the text provided, create a set of fish.
-              Ask the question (front) and the answer (back).
-              The questions can be clear and allowed.
-              Responsibility for being concise but complete.
+              content: `You are an expert in creating educational flashcards. You will receive a text and your task is to create flashcards from it.
+              For each important concept in the text, create a question (front) and answer (back).
+              Make questions clear, concise but comprehensive.
+              Make answers complete but not too verbose.
+              Don't use the exact text from the source - rephrase in your own words.
+              Generate 3-5 high-quality flashcards.
               
               Source text:
               ${command.source_text}`,
@@ -138,8 +147,21 @@ export async function onRequestPost({ request, env }: { request: Request; env: E
           },
         });
       } catch (error) {
-        console.error('OpenRouter API error:', error);
-        throw new Error('Failed to generate flashcards with AI');
+        console.error('OpenRouter API error:', {
+          error,
+          request: {
+            model: 'openai/gpt-4o-mini',
+            temperature: 0.7,
+            textLength: command.source_text.length
+          }
+        });
+        
+        let errorMessage = 'Failed to generate flashcards with AI';
+        if (error instanceof Error) {
+          errorMessage += `: ${error.message}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       if (!response.choices || response.choices.length === 0) {
