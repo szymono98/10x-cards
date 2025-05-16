@@ -10,6 +10,8 @@ import { BulkSaveButton } from '@/components/generate/BulkSaveButton';
 import { ErrorNotification } from '@/components/common/ErrorNotification';
 import { useSaveFlashcards } from '@/hooks/useSaveFlashcards';
 import { SuccessNotification } from '@/components/common/SuccessNotification';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
 interface FlashcardProposalWithStatus extends FlashcardProposalDto {
   accepted: boolean;
   edited: boolean;
@@ -33,6 +35,16 @@ export function FlashcardGenerationView() {
   } = useSaveFlashcards();
   const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const supabase = createClientComponentClient();
+
+  const checkAuth = useCallback(async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Error('Please log in to save flashcards');
+    }
+  }, [supabase.auth]);
 
   const handleGenerate = async () => {
     if (!text || text.length < 1000 || text.length > 10000) return;
@@ -45,7 +57,7 @@ export function FlashcardGenerationView() {
       setGenerateError(null);
       const result = await generate(command);
 
-      if (!result?.generation_id || !result?.flashcards_proposals) {
+      if (!result?.flashcards_proposals) {
         throw new Error('Invalid response from generation service');
       }
 
@@ -85,28 +97,30 @@ export function FlashcardGenerationView() {
   }, []);
 
   const handleSaveAccepted = useCallback(async () => {
-    if (!generationId) {
-      setSaveError('No generation ID found');
-      return;
-    }
-    setSuccess(null);
-    setSaveError(null);
-
-    const acceptedFlashcards = proposals
-      .filter((p) => p.accepted)
-      .map((p) => ({
-        front: p.front,
-        back: p.back,
-        source: p.edited ? ('ai-edited' as const) : ('ai-full' as const),
-        generation_id: generationId,
-      }));
-
-    if (acceptedFlashcards.length === 0) {
-      setSaveError('No flashcards selected to save');
-      return;
-    }
-
     try {
+      await checkAuth();
+
+      if (!generationId) {
+        setSaveError('No generation ID found');
+        return;
+      }
+      setSuccess(null);
+      setSaveError(null);
+
+      const acceptedFlashcards = proposals
+        .filter((p) => p.accepted)
+        .map((p) => ({
+          front: p.front,
+          back: p.back,
+          source: p.edited ? ('ai-edited' as const) : ('ai-full' as const),
+          generation_id: generationId,
+        }));
+
+      if (acceptedFlashcards.length === 0) {
+        setSaveError('No flashcards selected to save');
+        return;
+      }
+
       await save({ flashcards: acceptedFlashcards, generation_id: generationId });
       startTransition(() => {
         setSuccess('Flashcards are saved successfully');
@@ -119,20 +133,22 @@ export function FlashcardGenerationView() {
       setSaveError(error instanceof Error ? error.message : 'Failed to save flashcards');
       setSuccess(null);
     }
-  }, [proposals, generationId, save, setText, setSaveError]);
+  }, [checkAuth, proposals, generationId, save, setText, setSaveError]);
 
   const handleSaveAll = useCallback(async () => {
-    if (!generationId) return;
-    setSuccess(null);
-
-    const allFlashcards = proposals.map((p) => ({
-      front: p.front,
-      back: p.back,
-      source: p.edited ? ('ai-edited' as const) : ('ai-full' as const),
-      generation_id: generationId,
-    }));
-
     try {
+      await checkAuth();
+
+      if (!generationId) return;
+      setSuccess(null);
+
+      const allFlashcards = proposals.map((p) => ({
+        front: p.front,
+        back: p.back,
+        source: p.edited ? ('ai-edited' as const) : ('ai-full' as const),
+        generation_id: generationId,
+      }));
+
       await save({ flashcards: allFlashcards, generation_id: generationId });
       startTransition(() => {
         setSuccess('All flashcards are saved successfully');
@@ -144,7 +160,7 @@ export function FlashcardGenerationView() {
       console.error('Failed to save flashcards:', error);
       setSuccess(null);
     }
-  }, [proposals, generationId, save, setText]);
+  }, [checkAuth, proposals, generationId, save, setText]);
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -173,7 +189,7 @@ export function FlashcardGenerationView() {
               onAccept={handleAccept}
               onReject={handleReject}
               onEdit={handleEdit}
-              data-testid="flashcard-list"
+              data-testid="flashcards-list"
             />
             <div className="flex gap-4">
               <BulkSaveButton

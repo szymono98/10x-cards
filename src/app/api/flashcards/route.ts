@@ -1,9 +1,15 @@
 export const runtime = 'edge';
 
 import { NextRequest } from 'next/server';
-import { FlashcardsCreateCommand } from '../../../types';
-import { validateFlashcardsCommand } from '../validation/flashcards.validation';
-import { createSupabaseClient } from '../../../lib/supabase.functions';
+import { createClient } from '@supabase/supabase-js';
+import type { FlashcardsCreateCommand } from '@/types';
+
+function createSupabaseClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,12 +22,9 @@ export async function GET(request: NextRequest) {
     }
     const token = authHeader.split(' ')[1];
 
-    const supabase = createSupabaseClient({
-      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    });
+    const supabase = createSupabaseClient();
 
-    // Próba pobrania użytkownika bezpośrednio z tokena
+    // Get user from token
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
     if (userError || !user) {
@@ -38,6 +41,7 @@ export async function GET(request: NextRequest) {
     const { data: flashcards, error } = await supabase
       .from('flashcards')
       .select('*')
+      .eq('user_id', user.id)  // Only return user's own flashcards
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -45,7 +49,7 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    return new Response(JSON.stringify(flashcards), {
+    return new Response(JSON.stringify({ data: flashcards }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -65,39 +69,19 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check for auth token
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
-      throw new Error('No authorization token');
-    }
-
-    const token = authHeader.split(' ')[1];
-    const supabase = createSupabaseClient({
-      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    });
-
-    // Validate session first
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session || session.access_token !== token) {
-      return new Response(JSON.stringify({ error: 'Invalid or expired session' }), {
+      return new Response(JSON.stringify({ error: 'Unauthorized - Missing token' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    const body = await request.json();
-    console.log('Received flashcards request:', body);
-    const validation = validateFlashcardsCommand(body);
+    const token = authHeader.split(' ')[1];
+    const supabase = createSupabaseClient();
 
-    if (!validation.success) {
-      return new Response(JSON.stringify({ error: validation.error }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    const command = body as FlashcardsCreateCommand;
-
+    // Validate session and get user
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     if (userError || !user?.id) {
       console.error('User retrieval failed:', userError);
@@ -110,6 +94,27 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Parse request body
+    const body = await request.json();
+    const command = body as FlashcardsCreateCommand;
+
+    // Validate flashcards data
+    if (!Array.isArray(command.flashcards) || command.flashcards.length === 0) {
+      return new Response(JSON.stringify({ error: 'No flashcards provided' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Require generation_id
+    if (!command.generation_id) {
+      return new Response(JSON.stringify({ error: 'Generation ID is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Insert flashcards with user ID
     const { data: flashcards, error } = await supabase
       .from('flashcards')
       .insert(
