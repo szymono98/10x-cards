@@ -5,14 +5,23 @@ import { FlashcardsCreateCommand } from '../../../types';
 import { validateFlashcardsCommand } from '../validation/flashcards.validation';
 import { createSupabaseClient } from '../../../lib/supabase.functions';
 
-const DEFAULT_USER_ID = '6e61325f-0a6f-4404-8e55-f704bde8e5dd';
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Create supabase client with auth context
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized - Missing token' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    const token = authHeader.split(' ')[1];
+
     const supabase = createSupabaseClient({
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
+    supabase.auth.setSession({ access_token: token, refresh_token: '' });
 
     const { data: flashcards, error } = await supabase
       .from('flashcards')
@@ -44,6 +53,16 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Create supabase client with auth context
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized - Missing token' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    const token = authHeader.split(' ')[1];
+
     const body = await request.json();
     console.log('Received flashcards request:', body);
     const validation = validateFlashcardsCommand(body);
@@ -61,6 +80,12 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
+    supabase.auth.setSession({ access_token: token, refresh_token: '' });
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('Could not get user from token');
+    }
 
     const { data: flashcards, error } = await supabase
       .from('flashcards')
@@ -68,7 +93,7 @@ export async function POST(request: NextRequest) {
         command.flashcards.map((flashcard) => ({
           front: flashcard.front,
           back: flashcard.back,
-          user_id: DEFAULT_USER_ID,
+          user_id: user.id,
           generation_id: command.generation_id,
           source: flashcard.source,
         }))
