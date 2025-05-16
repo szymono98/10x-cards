@@ -66,14 +66,38 @@ export class FlashcardGenerationPage {
   async generateAndSaveFlashcards(text: string, { acceptIndexes = [0, 1] } = {}) {
     await this.generateFlashcards(text);
     
-    // Wait for flashcards to be interactive
+    // Wait for all flashcards to be fully loaded and interactive
+    await Promise.all(
+      acceptIndexes.map(async (index) => {
+        // Wait for the flashcard container to be visible and stable
+        await this.page.getByTestId(`flashcard-item-${index}`).waitFor({ 
+          state: 'visible', 
+          timeout: 10000
+        });
+      })
+    );
+
+    // Accept each flashcard with a small delay between actions
     for (const index of acceptIndexes) {
-      await this.page.getByTestId(`flashcard-item-${index}`).waitFor({ state: 'attached' });
       await this.acceptFlashcard(index);
+      // Add a small delay to ensure UI updates properly
+      await this.page.waitForTimeout(100);
     }
 
-    // Wait for save button to be enabled
-    await this.saveAcceptedButton.waitFor({ state: 'enabled' });
+    // Wait for save button to be visible and interactive
+    await this.saveAcceptedButton.waitFor({ 
+      state: 'visible', 
+      timeout: 5000 
+    });
+    
+    // Wait until the save button is not disabled
+    await this.saveAcceptedButton.evaluate(button => {
+      if (button instanceof HTMLButtonElement) {
+        return !button.disabled;
+      }
+      return true;
+    });
+    
     await this.saveAcceptedFlashcards();
     await this.waitForSuccessMessage();
   }
