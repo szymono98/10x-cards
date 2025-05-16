@@ -1,5 +1,6 @@
 import { FlashcardProposalDto, FlashcardsCreateCommand } from '../types';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useState } from 'react';
 
 interface GenerationResponse {
   generation_id: number | null; // zmienione z string na number | null
@@ -14,20 +15,19 @@ export function FlashcardsProposalsList({
   generationResponse: GenerationResponse;
 }) {
   const supabase = createClientComponentClient();
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveFlashcards = async () => {
-    if (!generationResponse.is_authenticated) {
-      // Możemy pokazać modal/toast informujący o konieczności zalogowania się aby zapisać
-      alert('Zaloguj się aby zapisać fiszki');
-      return;
-    }
-
+    setIsSaving(true);
     try {
       const {
         data: { session },
+        error,
       } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        throw new Error('No access token available');
+
+      if (error || !session) {
+        await supabase.auth.signOut();
+        throw new Error('Session expired - please log in again');
       }
 
       const command: FlashcardsCreateCommand = {
@@ -55,7 +55,9 @@ export function FlashcardsProposalsList({
       }
     } catch (error) {
       console.error('Error saving flashcards:', error);
-      alert('Nie udało się zapisać fiszek');
+      alert(error instanceof Error ? error.message : 'Nie udało się zapisać fiszek');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -71,7 +73,9 @@ export function FlashcardsProposalsList({
 
       {/* Przycisk zapisywania tylko dla zalogowanych */}
       {generationResponse.is_authenticated && (
-        <button onClick={handleSaveFlashcards}>Zapisz fiszki</button>
+        <button onClick={handleSaveFlashcards} disabled={isSaving}>
+          {isSaving ? 'Zapisuję...' : 'Zapisz fiszki'}
+        </button>
       )}
     </div>
   );

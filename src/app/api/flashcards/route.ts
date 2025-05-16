@@ -65,6 +65,26 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw new Error('No authorization token');
+    }
+
+    const token = authHeader.split(' ')[1];
+    const supabase = createSupabaseClient({
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    });
+
+    // Validate session first
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session || session.access_token !== token) {
+      return new Response(JSON.stringify({ error: 'Invalid or expired session' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     const body = await request.json();
     console.log('Received flashcards request:', body);
     const validation = validateFlashcardsCommand(body);
@@ -77,21 +97,6 @@ export async function POST(request: NextRequest) {
     }
 
     const command = body as FlashcardsCreateCommand;
-
-    // Check if user is authenticated
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Unauthorized - Must be logged in to save flashcards' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    const token = authHeader.split(' ')[1];
-    const supabase = createSupabaseClient({
-      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    });
 
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     if (userError || !user?.id) {
