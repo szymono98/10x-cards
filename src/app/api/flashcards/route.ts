@@ -80,11 +80,36 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
-    supabase.auth.setSession({ access_token: token, refresh_token: '' });
 
-    const { data: { user } } = await supabase.auth.getUser();
+    // Create a proper session object
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token: token,
+      refresh_token: ''
+    });
+
+    if (sessionError) {
+      console.error('Session error:', sessionError);
+      return new Response(JSON.stringify({ error: 'Invalid or expired token' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    if (userError) {
+      console.error('User error:', userError);
+      return new Response(JSON.stringify({ error: 'Failed to get user data' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    
     if (!user) {
-      throw new Error('Could not get user from token');
+      console.error('No user found for token');
+      return new Response(JSON.stringify({ error: 'User not found' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const { data: flashcards, error } = await supabase
