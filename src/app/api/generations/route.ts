@@ -6,8 +6,6 @@ import { validateGenerateCommand } from '../validation/generations.validation';
 import { createSupabaseClient } from '../../../lib/supabase.functions';
 import { OpenRouterService } from '../../../lib/openrouter.service';
 
-const DEFAULT_USER_ID = '6e61325f-0a6f-4404-8e55-f704bde8e5dd';
-
 async function generateHash(message: string): Promise<string> {
   const msgBuffer = new TextEncoder().encode(message);
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -18,6 +16,16 @@ async function generateHash(message: string): Promise<string> {
 
 export async function POST(request: NextRequest) {
   try {
+    // Create supabase client with auth context
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized - Missing token' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    const token = authHeader.split(' ')[1];
+
     // Parse and validate request body
     const body = await request.json();
     const validation = validateGenerateCommand(body);
@@ -38,6 +46,7 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
+    supabase.auth.setSession({ access_token: token, refresh_token: '' });
 
     const openRouter = OpenRouterService.getInstance({
       apiKey: process.env.OPENROUTER_API_KEY!,
@@ -47,10 +56,15 @@ export async function POST(request: NextRequest) {
 
     // Create generation record
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Could not get user from token');
+      }
+
       const { data: generation, error: insertError } = await supabase
         .from('generations')
         .insert({
-          user_id: DEFAULT_USER_ID,
+          user_id: user.id,
           source_text_hash: sourceTextHash,
           source_text_length: command.source_text.length,
           model: 'openai/gpt-4o-mini',
