@@ -81,48 +81,35 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
 
-    // Debugowanie sesji
-    console.log('Setting up session with token:', {
-      tokenLength: token.length,
-      urlConfig: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      anonKeyConfig: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    });
-
-    // Próba utworzenia sesji z pełną konfiguracją
-    const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-      access_token: token,
-      refresh_token: ''
-    });
-
-    if (sessionError) {
-      console.error('Session setup failed:', sessionError);
-      return new Response(JSON.stringify({ 
-        error: 'Session initialization failed', 
-        details: sessionError.message 
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log('Session setup successful:', {
-      hasSession: !!sessionData.session,
-      hasUser: !!sessionData.user
-    });
-
-    // Próba pobrania użytkownika z utworzonej sesji
+    // Próba pobrania użytkownika bezpośrednio z tokena
     const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
-    if (userError || !user) {
-      console.error('User error details:', userError);
+    if (userError) {
+      console.error('User retrieval failed:', userError);
       return new Response(JSON.stringify({ 
         error: 'Authentication failed', 
-        details: userError?.message || 'No user found' 
+        details: userError.message 
       }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       });
     }
+
+    if (!user) {
+      console.error('No user found with token');
+      return new Response(JSON.stringify({ 
+        error: 'Authentication failed', 
+        details: 'No user found' 
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('User authenticated successfully:', {
+      userId: user.id,
+      email: user.email
+    });
 
     // Dodatkowe sprawdzenie czy mamy ID użytkownika
     if (!user.id) {
