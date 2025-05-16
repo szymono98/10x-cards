@@ -7,7 +7,6 @@ import { createSupabaseClient } from '../../../lib/supabase.functions';
 
 export async function GET(request: NextRequest) {
   try {
-    // Create supabase client with auth context
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized - Missing token' }), {
@@ -21,7 +20,20 @@ export async function GET(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
-    supabase.auth.setSession({ access_token: token, refresh_token: '' });
+
+    // Próba pobrania użytkownika bezpośrednio z tokena
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+
+    if (userError || !user) {
+      console.error('User retrieval failed:', userError);
+      return new Response(JSON.stringify({ 
+        error: 'Authentication failed', 
+        details: userError?.message || 'No user found' 
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     const { data: flashcards, error } = await supabase
       .from('flashcards')
