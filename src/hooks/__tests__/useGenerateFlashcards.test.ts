@@ -26,7 +26,7 @@ describe('useGenerateFlashcards', () => {
 
     // Set up the MSW handler for this specific test
     server.use(
-      http.post('/api/generations', () => {
+      http.post('/functions/api/generations', () => {
         return HttpResponse.json(mockResponse);
       })
     );
@@ -49,7 +49,7 @@ describe('useGenerateFlashcards', () => {
   it('should handle generation errors', async () => {
     // Mock an error response
     server.use(
-      http.post('/api/generations', () => {
+      http.post('/functions/api/generations', () => {
         return new HttpResponse(
           JSON.stringify({ error: 'Failed to generate flashcards' }),
           { status: 500 }

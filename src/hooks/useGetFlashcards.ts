@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { FlashcardDto, FlashcardsListResponseDto } from '@/types';
 
-const API_ENDPOINT = '/api/flashcards';
+const API_ENDPOINT = '/functions/api/flashcards';
 
 export function useGetFlashcards() {
   const [flashcards, setFlashcards] = useState<FlashcardDto[]>([]);

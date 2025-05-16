@@ -1,10 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { GenerateFlashcardsCommand, GenerationCreateResponseDto } from '@/types';
 
-// Use environment-aware API endpoint
-const API_ENDPOINT = process.env.NODE_ENV === 'development' 
-  ? '/functions/api/generations'  // Local development
-  : '/api/generations';           // Production
+const API_ENDPOINT = '/functions/api/generations';
 
 export function useGenerateFlashcards() {
   const [isLoading, setIsLoading] = useState(false);
