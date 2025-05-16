@@ -3,22 +3,12 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-  // Debug logging
-  console.log('[Middleware] Request details:', {
-    pathname: req.nextUrl.pathname,
-    method: req.method,
-    host: req.headers.get('host'),
-    userAgent: req.headers.get('user-agent'),
-    referer: req.headers.get('referer')
-  });
-  
   // Early return for static assets and API routes
   if (
     req.nextUrl.pathname.startsWith('/_next') ||
     req.nextUrl.pathname.startsWith('/api') ||
     req.nextUrl.pathname.match(/\.(ico|png|jpg|jpeg|svg)$/)
   ) {
-    console.log('[Middleware] Early return for static asset:', req.nextUrl.pathname);
     return NextResponse.next();
   }
 
@@ -31,31 +21,15 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
   try {
-    console.log('[Middleware] Creating Supabase client');
-    const supabase = createMiddlewareClient({ 
-      req, 
-      res,
-    });
-
-    // Try to get the session
-    console.log('[Middleware] Fetching session');
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
+    const supabase = createMiddlewareClient({ req, res });
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
     if (sessionError) {
-      console.error('[Middleware] Session error:', sessionError);
-      // W przypadku błędu sesji, pozwól na dostęp do wszystkich ścieżek oprócz chronionych
       if (req.nextUrl.pathname === '/my-collection') {
-        console.log('[Middleware] Redirecting to login due to session error');
         return NextResponse.redirect(new URL('/auth/login', req.url));
       }
       return res;
     }
-
-    // Log session status
-    console.log('[Middleware] Session status:', session ? 'Authenticated' : 'Not authenticated');
 
     // Protected paths logic - tylko /my-collection wymaga autentykacji
     const protectedPaths = ['/my-collection'];

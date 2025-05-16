@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { GenerateFlashcardsCommand, GenerationCreateResponseDto } from '@/types';
 
-const API_ENDPOINT = '/functions/api/generations';
+const API_ENDPOINT = '/api/generations';
 
 export function useGenerateFlashcards() {
   const [isLoading, setIsLoading] = useState(false);
@@ -22,15 +22,15 @@ export function useGenerateFlashcards() {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to generate flashcards');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        return await response.json();
-      } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : 'Unexpected error occurred';
-        setError(errorMessage);
-        throw e;
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'An error occurred';
+        setError(message);
+        throw error;
       } finally {
         setIsLoading(false);
       }

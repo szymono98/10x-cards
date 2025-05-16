@@ -7,34 +7,24 @@ interface Env {
 }
 
 export function createSupabaseClient(env: Env) {
-  const supabaseUrl = new URL(env.NEXT_PUBLIC_SUPABASE_URL);
-  
   return createClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       auth: {
-        persistSession: false,
-        detectSessionInUrl: false,
-        flowType: 'pkce',
+        persistSession: true,
         autoRefreshToken: true,
+        flowType: 'pkce',
+        detectSessionInUrl: true,
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined
       },
       global: {
-        fetch: fetch.bind(globalThis),
         headers: {
-          'X-Client-Info': '10x-cards-cloudflare',
-          'Origin': 'https://10x-cards.pages.dev',
-          'Host': supabaseUrl.hostname,
+          'X-Client-Info': '10x-cards-cloudflare'
         }
       },
       db: {
         schema: 'public'
-      },
-      realtime: {
-        headers: {
-          'Origin': 'https://10x-cards.pages.dev',
-          'Host': supabaseUrl.hostname,
-        }
       }
     }
   );

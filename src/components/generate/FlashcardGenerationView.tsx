@@ -107,7 +107,7 @@ export function FlashcardGenerationView() {
     }
 
     try {
-      await save({ flashcards: acceptedFlashcards });
+      await save({ flashcards: acceptedFlashcards, generation_id: generationId });
       startTransition(() => {
         setSuccess('Flashcards are saved successfully');
         setProposals([]);
@@ -133,7 +133,7 @@ export function FlashcardGenerationView() {
     }));
 
     try {
-      await save({ flashcards: allFlashcards });
+      await save({ flashcards: allFlashcards, generation_id: generationId });
       startTransition(() => {
         setSuccess('All flashcards are saved successfully');
         setProposals([]);

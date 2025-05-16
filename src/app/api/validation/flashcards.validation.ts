@@ -16,12 +16,6 @@ export function validateFlashcardsCommand(data: unknown): ValidationResult {
     return { success: false, error: 'No flashcards provided' };
   }
 
-  if (typeof command.generation_id !== 'number') {
-    return { success: false, error: 'Generation ID required' };
-  }
-
-  const validSources: Source[] = ['ai-full', 'ai-edited', 'manual'];
-
   for (const flashcard of command.flashcards) {
     if (!flashcard.front || typeof flashcard.front !== 'string' || flashcard.front.length > 200) {
       return { success: false, error: 'Invalid front content (max 200 characters)' };
@@ -31,8 +25,20 @@ export function validateFlashcardsCommand(data: unknown): ValidationResult {
       return { success: false, error: 'Invalid back content (max 500 characters)' };
     }
 
+    const validSources: Source[] = ['ai-full', 'ai-edited', 'manual'];
     if (!flashcard.source || !validSources.includes(flashcard.source)) {
       return { success: false, error: 'Invalid source type' };
+    }
+
+    if (
+      (flashcard.source === 'ai-full' || flashcard.source === 'ai-edited') &&
+      typeof flashcard.generation_id !== 'number'
+    ) {
+      return { success: false, error: 'Generation ID required for AI-generated flashcards' };
+    }
+
+    if (flashcard.source === 'manual' && flashcard.generation_id !== null) {
+      return { success: false, error: 'Generation ID must be null for manual flashcards' };
     }
   }
 

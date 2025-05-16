@@ -57,6 +57,7 @@ export interface FlashcardCreateDto {
 
 export interface FlashcardsCreateCommand {
   flashcards: FlashcardCreateDto[];
+  generation_id: number;
 }
 
 // ------------------------------------------------------------------------------------------------

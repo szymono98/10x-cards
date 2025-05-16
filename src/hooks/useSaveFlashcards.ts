@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { FlashcardDto, FlashcardsCreateCommand } from '@/types';
 
-const API_ENDPOINT = '/functions/api/flashcards';
+const API_ENDPOINT = '/api/flashcards';
 
 export function useSaveFlashcards() {
   const [isLoading, setIsLoading] = useState(false);
