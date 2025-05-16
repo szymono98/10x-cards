@@ -7,17 +7,12 @@ import { useSaveFlashcards } from '@/hooks/useSaveFlashcards';
 // Mock external dependencies
 vi.mock('@/hooks/useGenerateFlashcards');
 vi.mock('@/hooks/useSaveFlashcards');
-vi.mock('@/components/generate/TextInputArea', () => ({
-  TextInputArea: ({ value, onChange }: { value: string; onChange: (value: string) => void }) => (
-    <textarea data-testid="text-input" value={value} onChange={(e) => onChange(e.target.value)} />
-  ),
-}));
 vi.mock('@/components/generate/GenerateButton', () => ({
   GenerateButton: ({ onClick, disabled }: { onClick: () => void; disabled: boolean }) => (
     <button
-      data-testid="generate-button"
       onClick={onClick}
       disabled={disabled}
+      data-testid="generate-flashcards-button"
       className="w-full sm:w-auto"
     >
       Generate
@@ -36,7 +31,7 @@ vi.mock('@/components/generate/FlashcardList', () => ({
     onReject: (index: number) => void;
     onEdit: (index: number, front: string, back: string) => void;
   }) => (
-    <div data-testid="flashcard-list" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div data-testid="flashcards-list" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {proposals.map((p: { front: string; back: string }, i: number) => (
         <div key={i} data-testid={`flashcard-${i}`}>
           <span>{p.front}</span>
@@ -49,26 +44,29 @@ vi.mock('@/components/generate/FlashcardList', () => ({
     </div>
   ),
 }));
-vi.mock('@/components/generate/BulkSaveButton', () => ({
-  BulkSaveButton: ({
-    onSaveAccepted,
-    hasAcceptedFlashcards,
-    isLoading,
-    label = 'Save accepted',
+
+vi.mock('@/components/generate/TextInputArea', () => ({
+  TextInputArea: ({
+    value,
+    onChange,
+    disabled,
   }: {
-    onSaveAccepted: () => Promise<void>;
-    hasAcceptedFlashcards: boolean;
-    isLoading: boolean;
-    label?: string;
+    value: string;
+    onChange: (value: string) => void;
+    disabled: boolean;
   }) => (
-    <button
-      onClick={onSaveAccepted}
-      disabled={!hasAcceptedFlashcards || isLoading}
-      data-testid={label === 'Save accepted' ? 'save-accepted-button' : 'save-all-button'}
-    >
-      {label}
-    </button>
+    <textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      disabled={disabled}
+      data-testid="source-text-input"
+    />
   ),
+}));
+vi.mock('@/lib/providers/supabase-provider', () => ({
+  useSupabase: () => ({
+    user: { id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a' },
+  }),
 }));
 
 describe('FlashcardGenerationView', () => {
@@ -104,13 +102,13 @@ describe('FlashcardGenerationView', () => {
       render(<FlashcardGenerationView />);
 
       // Generate flashcards first
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(1000) },
       });
-      fireEvent.click(screen.getByTestId('generate-button'));
+      fireEvent.click(screen.getByTestId('generate-flashcards-button'));
 
       await waitFor(() => {
-        expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
+        expect(screen.getByTestId('flashcards-list')).toBeInTheDocument();
       });
 
       // Test acceptance toggle
@@ -121,7 +119,21 @@ describe('FlashcardGenerationView', () => {
       expect(screen.getByTestId('save-accepted-button')).not.toBeDisabled();
     });
 
-    // Add more state handler tests...
+    it('should validate input text length', () => {
+      render(<FlashcardGenerationView />);
+
+      // Test too short text
+      fireEvent.change(screen.getByTestId('source-text-input'), {
+        target: { value: 'short' },
+      });
+      expect(screen.getByTestId('generate-flashcards-button')).toBeDisabled();
+
+      // Test valid text length
+      fireEvent.change(screen.getByTestId('source-text-input'), {
+        target: { value: 'a'.repeat(1000) },
+      });
+      expect(screen.getByTestId('generate-flashcards-button')).not.toBeDisabled();
+    });
   });
 
   // 2. Test save handlers
@@ -136,13 +148,13 @@ describe('FlashcardGenerationView', () => {
       render(<FlashcardGenerationView />);
 
       // Setup and trigger save
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(1000) },
       });
-      fireEvent.click(screen.getByTestId('generate-button'));
+      fireEvent.click(screen.getByTestId('generate-flashcards-button'));
 
       await waitFor(() => {
-        expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
+        expect(screen.getByTestId('flashcards-list')).toBeInTheDocument();
       });
 
       // Accept the flashcard first
@@ -174,16 +186,16 @@ describe('FlashcardGenerationView', () => {
       render(<FlashcardGenerationView />);
 
       // Test too short text
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'short' },
       });
-      expect(screen.getByTestId('generate-button')).toBeDisabled();
+      expect(screen.getByTestId('generate-flashcards-button')).toBeDisabled();
 
       // Test valid text length
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(1000) },
       });
-      expect(screen.getByTestId('generate-button')).not.toBeDisabled();
+      expect(screen.getByTestId('generate-flashcards-button')).not.toBeDisabled();
     });
 
     // Add more generation tests...
@@ -216,14 +228,14 @@ describe('FlashcardGenerationView', () => {
         flashcards_proposals: [{ front: 'test', back: 'answer' }],
       });
 
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(1000) },
       });
-      fireEvent.click(screen.getByTestId('generate-button'));
+      fireEvent.click(screen.getByTestId('generate-flashcards-button'));
 
       // Wait for flashcards to be generated
       await waitFor(() => {
-        expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
+        expect(screen.getByTestId('flashcards-list')).toBeInTheDocument();
       });
 
       // Get the initial handlers
@@ -251,13 +263,13 @@ describe('FlashcardGenerationView', () => {
       render(<FlashcardGenerationView />);
 
       // Setup flashcards
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(1000) },
       });
-      fireEvent.click(screen.getByTestId('generate-button'));
+      fireEvent.click(screen.getByTestId('generate-flashcards-button'));
 
       await waitFor(() => {
-        expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
+        expect(screen.getByTestId('flashcards-list')).toBeInTheDocument();
       });
 
       // Accept the flashcard first
@@ -272,8 +284,8 @@ describe('FlashcardGenerationView', () => {
       fireEvent.click(screen.getByTestId('save-accepted-button'));
 
       // Verify that UI remains responsive during the transition
-      expect(screen.getByTestId('text-input')).not.toBeDisabled();
-      expect(screen.getByTestId('generate-button')).not.toBeDisabled();
+      expect(screen.getByTestId('source-text-input')).not.toBeDisabled();
+      expect(screen.getByTestId('generate-flashcards-button')).not.toBeDisabled();
 
       // Wait for save to complete
       await waitFor(() => {
@@ -292,13 +304,13 @@ describe('FlashcardGenerationView', () => {
       render(<FlashcardGenerationView />);
 
       // Generate initial flashcards
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(1000) },
       });
-      fireEvent.click(screen.getByTestId('generate-button'));
+      fireEvent.click(screen.getByTestId('generate-flashcards-button'));
 
       await waitFor(() => {
-        expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
+        expect(screen.getByTestId('flashcards-list')).toBeInTheDocument();
       });
 
       // Trigger edit
@@ -322,13 +334,13 @@ describe('FlashcardGenerationView', () => {
       render(<FlashcardGenerationView />);
 
       // Generate flashcards
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(1000) },
       });
-      fireEvent.click(screen.getByTestId('generate-button'));
+      fireEvent.click(screen.getByTestId('generate-flashcards-button'));
 
       await waitFor(() => {
-        expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
+        expect(screen.getByTestId('flashcards-list')).toBeInTheDocument();
       });
 
       // Initial count
@@ -354,13 +366,13 @@ describe('FlashcardGenerationView', () => {
       render(<FlashcardGenerationView />);
 
       // Generate flashcards
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(1000) },
       });
-      fireEvent.click(screen.getByTestId('generate-button'));
+      fireEvent.click(screen.getByTestId('generate-flashcards-button'));
 
       await waitFor(() => {
-        expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
+        expect(screen.getByTestId('flashcards-list')).toBeInTheDocument();
       });
 
       // Save all flashcards
@@ -395,23 +407,23 @@ describe('FlashcardGenerationView', () => {
       render(<FlashcardGenerationView />);
 
       // Verify loading state
-      expect(screen.getByTestId('generate-button')).toBeDisabled();
+      expect(screen.getByTestId('generate-flashcards-button')).toBeDisabled();
     });
 
     it('should validate maximum text length', () => {
       render(<FlashcardGenerationView />);
 
       // Test maximum length validation
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(10001) },
       });
-      expect(screen.getByTestId('generate-button')).toBeDisabled();
+      expect(screen.getByTestId('generate-flashcards-button')).toBeDisabled();
 
       // Test valid length
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(10000) },
       });
-      expect(screen.getByTestId('generate-button')).not.toBeDisabled();
+      expect(screen.getByTestId('generate-flashcards-button')).not.toBeDisabled();
     });
   });
 
@@ -446,17 +458,17 @@ describe('FlashcardGenerationView', () => {
       render(<FlashcardGenerationView />);
 
       // Generate flashcards first
-      fireEvent.change(screen.getByTestId('text-input'), {
+      fireEvent.change(screen.getByTestId('source-text-input'), {
         target: { value: 'a'.repeat(1000) },
       });
-      fireEvent.click(screen.getByTestId('generate-button'));
+      fireEvent.click(screen.getByTestId('generate-flashcards-button'));
 
       await waitFor(() => {
-        expect(screen.getByTestId('flashcard-list')).toBeInTheDocument();
+        expect(screen.getByTestId('flashcards-list')).toBeInTheDocument();
       });
 
       // Verify responsive grid classes
-      const flashcardList = screen.getByTestId('flashcard-list');
+      const flashcardList = screen.getByTestId('flashcards-list');
       expect(flashcardList).toHaveClass('grid', 'gap-4', 'md:grid-cols-2', 'lg:grid-cols-3');
 
       // Verify container padding is responsive
@@ -464,7 +476,7 @@ describe('FlashcardGenerationView', () => {
       expect(mainContainer).toHaveClass('px-4');
 
       // Verify buttons are responsive
-      const generateButton = screen.getByTestId('generate-button');
+      const generateButton = screen.getByTestId('generate-flashcards-button');
       expect(generateButton).toHaveClass('w-full', 'sm:w-auto');
     });
   });

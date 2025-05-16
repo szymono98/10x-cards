@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { NextRequest } from 'next/server';
 import { FlashcardsCreateCommand } from '../../../types';
 import { validateFlashcardsCommand } from '../validation/flashcards.validation';
