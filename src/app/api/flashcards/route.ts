@@ -81,32 +81,31 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
 
-    // Create a proper session object
-    const { error: sessionError } = await supabase.auth.setSession({
-      access_token: token,
-      refresh_token: ''
-    });
+    // Debugowanie tokenu
+    console.log('Auth token:', token.substring(0, 10) + '...');
 
-    if (sessionError) {
-      console.error('Session error:', sessionError);
-      return new Response(JSON.stringify({ error: 'Invalid or expired token' }), {
+    // Ustawiamy token i od razu próbujemy pobrać użytkownika
+    await supabase.auth.setSession({ access_token: token, refresh_token: '' });
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      console.error('User error details:', userError);
+      return new Response(JSON.stringify({ 
+        error: 'Authentication failed', 
+        details: userError?.message || 'No user found' 
+      }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    if (userError) {
-      console.error('User error:', userError);
-      return new Response(JSON.stringify({ error: 'Failed to get user data' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-    
-    if (!user) {
-      console.error('No user found for token');
-      return new Response(JSON.stringify({ error: 'User not found' }), {
+    // Dodatkowe sprawdzenie czy mamy ID użytkownika
+    if (!user.id) {
+      console.error('User object:', user);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid user data', 
+        details: 'Missing user ID' 
+      }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       });

@@ -16,15 +16,29 @@ async function generateHash(message: string): Promise<string> {
 
 export async function POST(request: NextRequest) {
   try {
-    // Create supabase client with auth context
+    // Debug request headers
+    console.log('All request headers:', Object.fromEntries(request.headers.entries()));
+    
     const authHeader = request.headers.get('authorization');
+    console.log('Raw authorization header:', authHeader);
+    
     if (!authHeader?.startsWith('Bearer ')) {
+      console.error('Authorization header validation failed:', { 
+        headerExists: !!authHeader,
+        startsWithBearer: authHeader?.startsWith('Bearer '),
+        headerValue: authHeader?.substring(0, 20) + '...'
+      });
       return new Response(JSON.stringify({ error: 'Unauthorized - Missing token' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       });
     }
     const token = authHeader.split(' ')[1];
+    console.log('Token format check:', {
+      length: token.length,
+      firstChars: token.substring(0, 10) + '...',
+      lastChars: '...' + token.substring(token.length - 10)
+    });
 
     // Parse and validate request body
     const body = await request.json();
@@ -46,7 +60,35 @@ export async function POST(request: NextRequest) {
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     });
-    supabase.auth.setSession({ access_token: token, refresh_token: '' });
+
+    // Debugowanie tokenu
+    console.log('Auth token:', token.substring(0, 10) + '...');
+
+    // Ustawiamy token i od razu próbujemy pobrać użytkownika
+    await supabase.auth.setSession({ access_token: token, refresh_token: '' });
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      console.error('User error details:', userError);
+      return new Response(JSON.stringify({ 
+        error: 'Authentication failed', 
+        details: userError?.message || 'No user found' 
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!user.id) {
+      console.error('User object:', user);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid user data', 
+        details: 'Missing user ID' 
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     const openRouter = OpenRouterService.getInstance({
       apiKey: process.env.OPENROUTER_API_KEY!,
@@ -56,11 +98,6 @@ export async function POST(request: NextRequest) {
 
     // Create generation record
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error('Could not get user from token');
-      }
-
       const { data: generation, error: insertError } = await supabase
         .from('generations')
         .insert({
