@@ -11,6 +11,7 @@ import { ErrorNotification } from '@/components/common/ErrorNotification';
 import { useSaveFlashcards } from '@/hooks/useSaveFlashcards';
 import { SuccessNotification } from '@/components/common/SuccessNotification';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useSupabase } from '@/lib/providers/supabase-provider';
 
 interface FlashcardProposalWithStatus extends FlashcardProposalDto {
   accepted: boolean;
@@ -18,6 +19,7 @@ interface FlashcardProposalWithStatus extends FlashcardProposalDto {
 }
 
 export function FlashcardGenerationView() {
+  const { user } = useSupabase();
   const [text, setText] = useState('');
   const {
     generate,
@@ -189,8 +191,26 @@ export function FlashcardGenerationView() {
               onAccept={handleAccept}
               onReject={handleReject}
               onEdit={handleEdit}
+              isUserLoggedIn={!!user}
               data-testid="flashcards-list"
             />
+            {!user && (
+              <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-6 text-center">
+                <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  Ready to save your flashcards?
+                </h3>
+                <p className="text-blue-700 dark:text-blue-300 mb-4">
+                  Sign up for free to edit, save, and organize your flashcards with our spaced
+                  repetition system.
+                </p>
+                <a
+                  href="/auth"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Create Free Account
+                </a>
+              </div>
+            )}
             <div className="flex gap-4">
               <BulkSaveButton
                 onSaveAccepted={handleSaveAccepted}

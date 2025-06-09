@@ -12,6 +12,7 @@ interface FlashcardItemProps {
   onAccept: () => void;
   onReject: () => void;
   onEdit: (front: string, back: string) => void;
+  isUserLoggedIn?: boolean;
   'data-testid'?: string;
 }
 
@@ -20,6 +21,7 @@ export function FlashcardItem({
   onAccept,
   onReject,
   onEdit,
+  isUserLoggedIn = false,
   'data-testid': testId,
 }: FlashcardItemProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -124,59 +126,73 @@ export function FlashcardItem({
                     {back}
                   </p>
                 </div>
-                <div className="flex justify-end space-x-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleStartEdit}
-                          data-testid={`${testId}-edit-button`}
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Edit flashcard</p>
-                      </TooltipContent>
-                    </Tooltip>
+                {isUserLoggedIn ? (
+                  <div className="flex justify-end space-x-2">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleStartEdit}
+                            data-testid={`${testId}-edit-button`}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Edit flashcard</p>
+                        </TooltipContent>
+                      </Tooltip>
 
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={onReject}
-                          className="text-red-600 hover:text-red-700"
-                          data-testid={`${testId}-reject-button`}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Reject flashcard</p>
-                      </TooltipContent>
-                    </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onReject}
+                            className="text-red-600 hover:text-red-700"
+                            data-testid={`${testId}-reject-button`}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Reject flashcard</p>
+                        </TooltipContent>
+                      </Tooltip>
 
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={onAccept}
-                          className="!bg-green-600 dark:!bg-green-500 !text-white border-green-600 dark:border-green-500 hover:!bg-green-700 dark:hover:!bg-green-600 hover:border-green-700 dark:hover:border-green-600"
-                          data-testid={`${testId}-accept-button`}
-                        >
-                          <Check className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Accept flashcard</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={onAccept}
+                            className="!bg-green-600 dark:!bg-green-500 !text-white border-green-600 dark:border-green-500 hover:!bg-green-700 dark:hover:!bg-green-600 hover:border-green-700 dark:hover:border-green-600"
+                            data-testid={`${testId}-accept-button`}
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Accept flashcard</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                ) : (
+                  <div className="flex justify-center mt-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                      <a
+                        href="/auth"
+                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                      >
+                        Sign up
+                      </a>{' '}
+                      to edit and save flashcards
+                    </p>
+                  </div>
+                )}
               </>
             )}
           </CardContent>

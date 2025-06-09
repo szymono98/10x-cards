@@ -7,6 +7,7 @@ interface FlashcardListProps {
   onAccept: (index: number) => void;
   onReject: (index: number) => void;
   onEdit: (index: number, front: string, back: string) => void;
+  isUserLoggedIn?: boolean;
   'data-testid'?: string;
 }
 
@@ -15,6 +16,7 @@ export const FlashcardList = memo(function FlashcardList({
   onAccept,
   onReject,
   onEdit,
+  isUserLoggedIn = false,
   'data-testid': testId,
 }: FlashcardListProps) {
   if (proposals.length === 0) return null;
@@ -28,6 +30,7 @@ export const FlashcardList = memo(function FlashcardList({
           onAccept={() => onAccept(index)}
           onReject={() => onReject(index)}
           onEdit={(front, back) => onEdit(index, front, back)}
+          isUserLoggedIn={isUserLoggedIn}
           data-testid={`flashcard-item-${index}`}
         />
       ))}
