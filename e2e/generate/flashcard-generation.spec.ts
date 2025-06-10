@@ -3,6 +3,65 @@ import { FlashcardGenerationPage } from '../page-objects/generate/FlashcardGener
 
 test.describe('Flashcard Generation', () => {
   test.beforeEach(async ({ page }) => {
+    // Mock authentication by setting mock user in localStorage
+    await page.addInitScript(() => {
+      // Mock user data that matches the expected shape
+      const mockUser = {
+        id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a',
+        email: 'test@example.com',
+        aud: 'authenticated',
+        role: 'authenticated'
+      };
+
+      // Set mock user in localStorage for the Supabase provider to pick up
+      localStorage.setItem('mock-user', JSON.stringify(mockUser));
+
+      // Mock the Supabase session for API calls
+      const mockSession = {
+        access_token: 'mock-access-token-12345',
+        refresh_token: 'mock-refresh-token',
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        user: mockUser
+      };
+
+      // Store mock session for the actual Supabase client to use if needed
+      localStorage.setItem('mock-session', JSON.stringify(mockSession));
+    });
+
+    // Mock Supabase auth API calls to return our mock session
+    await page.route('**/auth/v1/**', async (route) => {
+      const url = route.request().url();
+      
+      if (url.includes('/user')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a',
+            email: 'test@example.com',
+            aud: 'authenticated',
+            role: 'authenticated'
+          })
+        });
+      } else if (url.includes('/session')) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            access_token: 'mock-access-token-12345',
+            refresh_token: 'mock-refresh-token',
+            expires_at: Math.floor(Date.now() / 1000) + 3600,
+            user: {
+              id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a',
+              email: 'test@example.com'
+            }
+          })
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
     // Mock the generations endpoint
     await page.route('/api/generations', async (route) => {
       console.log('Handling /api/generations request');
@@ -57,12 +116,18 @@ test.describe('Flashcard Generation', () => {
       const request = route.request();
       if (request.method() === 'POST') {
         const data = await request.postDataJSON();
-        // Simulate API response delay
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
         console.log('Saving flashcards:', data);
+        
+        // Check if Authorization header is present
+        const authHeader = request.headers()['authorization'];
+        console.log('Authorization header:', authHeader);
+        
+        // Simulate API response delay
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         await route.fulfill({
           status: 201,
+          contentType: 'application/json',
           body: JSON.stringify({
             flashcards: data.flashcards.map(
               (card: {
@@ -72,7 +137,7 @@ test.describe('Flashcard Generation', () => {
                 generation_id: number;
               }) => ({
                 ...card,
-                id: 1,
+                id: Math.floor(Math.random() * 1000),
                 generation_id: data.generation_id,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
