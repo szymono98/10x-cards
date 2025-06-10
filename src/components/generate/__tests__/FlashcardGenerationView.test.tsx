@@ -7,6 +7,20 @@ import { useSaveFlashcards } from '@/hooks/useSaveFlashcards';
 // Mock external dependencies
 vi.mock('@/hooks/useGenerateFlashcards');
 vi.mock('@/hooks/useSaveFlashcards');
+vi.mock('@supabase/ssr', () => ({
+  createBrowserClient: () => ({
+    auth: {
+      getSession: vi.fn().mockResolvedValue({
+        data: { 
+          session: { 
+            access_token: 'test-token',
+            user: { id: 'test-user-id' }
+          } 
+        },
+      }),
+    },
+  }),
+}));
 vi.mock('@/components/generate/GenerateButton', () => ({
   GenerateButton: ({ onClick, disabled }: { onClick: () => void; disabled: boolean }) => (
     <button
@@ -26,17 +40,17 @@ vi.mock('@/components/generate/FlashcardList', () => ({
     onReject,
     onEdit,
   }: {
-    proposals: { front: string; back: string }[];
+    proposals: { front: string; back: string; accepted: boolean }[];
     onAccept: (index: number) => void;
     onReject: (index: number) => void;
     onEdit: (index: number, front: string, back: string) => void;
   }) => (
     <div data-testid="flashcards-list" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {proposals.map((p: { front: string; back: string }, i: number) => (
+      {proposals.map((p: { front: string; back: string; accepted: boolean }, i: number) => (
         <div key={i} data-testid={`flashcard-${i}`}>
           <span>{p.front}</span>
           <span>{p.back}</span>
-          <button onClick={() => onAccept(i)}>Accept</button>
+          <button onClick={() => onAccept(i)}>{p.accepted ? 'Accepted' : 'Accept'}</button>
           <button onClick={() => onReject(i)}>Reject</button>
           <button onClick={() => onEdit(i, 'edited front', 'edited back')}>Edit</button>
         </div>
@@ -67,6 +81,28 @@ vi.mock('@/lib/providers/supabase-provider', () => ({
   useSupabase: () => ({
     user: { id: '4da0d32e-3508-4a8b-a4f9-d8454ddf4a3a' },
   }),
+}));
+
+vi.mock('@/components/generate/BulkSaveButton', () => ({
+  BulkSaveButton: ({
+    onSaveAccepted,
+    hasAcceptedFlashcards,
+    isLoading,
+    label = 'Save accepted',
+  }: {
+    onSaveAccepted: () => Promise<void>;
+    hasAcceptedFlashcards: boolean;
+    isLoading: boolean;
+    label?: string;
+  }) => (
+    <button
+      onClick={onSaveAccepted}
+      disabled={!hasAcceptedFlashcards || isLoading}
+      data-testid={label === 'Save accepted' ? 'save-accepted-button' : 'save-all-button'}
+    >
+      {label}
+    </button>
+  ),
 }));
 
 describe('FlashcardGenerationView', () => {
@@ -158,7 +194,13 @@ describe('FlashcardGenerationView', () => {
       });
 
       // Accept the flashcard first
-      fireEvent.click(screen.getAllByText('Accept')[0]);
+      const acceptButton = screen.getByText('Accept');
+      fireEvent.click(acceptButton);
+
+      // Wait for the acceptance state to change
+      await waitFor(() => {
+        expect(screen.getByText('Accepted')).toBeInTheDocument();
+      });
 
       // Wait for the save button to be enabled
       await waitFor(() => {
@@ -168,8 +210,10 @@ describe('FlashcardGenerationView', () => {
       // Now save the accepted flashcard
       fireEvent.click(screen.getByTestId('save-accepted-button'));
 
-      // Verify save was called with correct data
-      expect(mockSave).toHaveBeenCalledWith(expect.any(Object));
+      // Wait for save to be called
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledWith(expect.any(Object));
+      });
 
       // Wait for and verify success message
       await waitFor(() => {
@@ -382,15 +426,17 @@ describe('FlashcardGenerationView', () => {
       });
       fireEvent.click(saveAllButton);
 
-      // Verify save was called with all flashcards
-      expect(mockSave).toHaveBeenCalledWith(
-        expect.objectContaining({
-          flashcards: expect.arrayContaining([
-            expect.objectContaining({ front: 'test1', back: 'answer1' }),
-            expect.objectContaining({ front: 'test2', back: 'answer2' }),
-          ]),
-        })
-      );
+      // Wait for save to be called with all flashcards
+      await waitFor(() => {
+        expect(mockSave).toHaveBeenCalledWith(
+          expect.objectContaining({
+            flashcards: expect.arrayContaining([
+              expect.objectContaining({ front: 'test1', back: 'answer1' }),
+              expect.objectContaining({ front: 'test2', back: 'answer2' }),
+            ]),
+          })
+        );
+      });
 
       await waitFor(() => {
         expect(screen.getByText(/All flashcards.*saved successfully/i)).toBeInTheDocument();
