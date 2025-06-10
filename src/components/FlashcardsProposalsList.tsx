@@ -1,5 +1,5 @@
 import { FlashcardProposalDto, FlashcardsCreateCommand } from '../types';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { useState } from 'react';
 
 interface GenerationResponse {
@@ -14,7 +14,10 @@ export function FlashcardsProposalsList({
 }: {
   generationResponse: GenerationResponse;
 }) {
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveFlashcards = async () => {

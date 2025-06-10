@@ -6,7 +6,7 @@ import AuthLayout from '@/components/layouts/AuthLayout';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useState, useCallback, useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
 
 interface RegisterFormData {
@@ -27,7 +27,10 @@ export default function RegisterPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const password = watch('password');
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   const onSubmit = useCallback(
     async (data: RegisterFormData) => {

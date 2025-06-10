@@ -10,7 +10,7 @@ import { BulkSaveButton } from '@/components/generate/BulkSaveButton';
 import { ErrorNotification } from '@/components/common/ErrorNotification';
 import { useSaveFlashcards } from '@/hooks/useSaveFlashcards';
 import { SuccessNotification } from '@/components/common/SuccessNotification';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { useSupabase } from '@/lib/providers/supabase-provider';
 
 interface FlashcardProposalWithStatus extends FlashcardProposalDto {
@@ -37,7 +37,10 @@ export function FlashcardGenerationView() {
   } = useSaveFlashcards();
   const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   const checkAuth = useCallback(async () => {
     const {

@@ -1,4 +1,4 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -18,17 +18,38 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/generate', req.url));
   }
 
-  const res = NextResponse.next();
+  const response = NextResponse.next({
+    request: {
+      headers: req.headers,
+    },
+  });
 
   try {
-    const supabase = createMiddlewareClient({ req, res });
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return req.cookies.get(name)?.value;
+          },
+          set(name: string, value: string, options: Record<string, unknown>) {
+            response.cookies.set({ name, value, ...options });
+          },
+          remove(name: string, options: Record<string, unknown>) {
+            response.cookies.set({ name, value: '', ...options });
+          },
+        },
+      }
+    );
+
+    const { data: { user }, error: sessionError } = await supabase.auth.getUser();
 
     if (sessionError) {
       if (req.nextUrl.pathname === '/my-collection') {
         return NextResponse.redirect(new URL('/auth/login', req.url));
       }
-      return res;
+      return response;
     }
 
     // Protected paths logic - tylko /my-collection wymaga autentykacji
@@ -37,7 +58,7 @@ export async function middleware(req: NextRequest) {
       req.nextUrl.pathname.startsWith(path)
     );
 
-    if (!session && isProtectedPath) {
+    if (!user && isProtectedPath) {
       console.log('[Middleware] Unauthorized access to protected path');
       const redirectUrl = new URL('/auth/login', req.url);
       redirectUrl.searchParams.set('returnTo', req.nextUrl.pathname);
@@ -45,21 +66,21 @@ export async function middleware(req: NextRequest) {
     }
 
     // Przekierowanie zalogowanych użytkowników z auth pages
-    if (session && req.nextUrl.pathname.startsWith('/auth/')) {
+    if (user && req.nextUrl.pathname.startsWith('/auth/')) {
       console.log('[Middleware] Redirecting authenticated user from auth page');
       return NextResponse.redirect(new URL('/generate', req.url));
     }
 
     // Dodaj nagłówki diagnostyczne
-    res.headers.set('x-middleware-cache', 'no-cache');
-    res.headers.set('x-middleware-handled', 'true');
-    res.headers.set('x-environment', process.env.NODE_ENV || 'development');
-    if (session) {
-      res.headers.set('x-session-user', session.user.id);
+    response.headers.set('x-middleware-cache', 'no-cache');
+    response.headers.set('x-middleware-handled', 'true');
+    response.headers.set('x-environment', process.env.NODE_ENV || 'development');
+    if (user) {
+      response.headers.set('x-session-user', user.id);
     }
 
     console.log('[Middleware] Request processed successfully');
-    return res;
+    return response;
   } catch (error) {
     console.error('[Middleware] Critical error:', error);
     
@@ -77,7 +98,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(new URL('/auth/login', req.url));
     }
     
-    return res;
+    return response;
   }
 }
 

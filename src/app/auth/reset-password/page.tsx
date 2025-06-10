@@ -6,7 +6,7 @@ import AuthLayout from '@/components/layouts/AuthLayout';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 
 interface ResetPasswordFormData {
   email: string;
@@ -21,7 +21,10 @@ export default function ResetPasswordPage() {
   } = useForm<ResetPasswordFormData>();
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     try {

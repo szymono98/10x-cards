@@ -6,7 +6,7 @@ import AuthLayout from '@/components/layouts/AuthLayout';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
 
 interface LoginFormData {
@@ -23,7 +23,10 @@ export default function LoginPage() {
   } = useForm<LoginFormData>();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   const onSubmit = async (data: LoginFormData) => {
     try {
